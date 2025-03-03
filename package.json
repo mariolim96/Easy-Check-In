@@ -11,6 +11,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "dev:turbo": "next dev --turbo",
+    "ui:add": "npx shadcn@latest add",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",

@@ -13,7 +13,7 @@ function makeDeleteRoute<Params, Search>(
 ): DeleteRouteBuilder<Params, Search>;
 ```
 
-Defined in: [src/routes/makeRoute.tsx:389](https://github.com/Its-Satyajit/nextjs-template/blob/c8d81b09293d759cbf04e9bc7e542cc7d90740e6/src/routes/makeRoute.tsx#L389)
+Defined in: [src/routes/makeRoute.tsx:389](https://github.com/mariolim96/Easy-Check-In/blob/e840a4393cceae48bed5204292fc61d73f9f5dbb/src/routes/makeRoute.tsx#L389)
 
 ## Type Parameters
 

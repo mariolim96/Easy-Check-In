@@ -10,10 +10,10 @@
 const config: object;
 ```
 
-Defined in: [src/middleware.ts:58](https://github.com/Its-Satyajit/nextjs-template/blob/c8d81b09293d759cbf04e9bc7e542cc7d90740e6/src/middleware.ts#L58)
+Defined in: [src/middleware.ts:58](https://github.com/mariolim96/Easy-Check-In/blob/e840a4393cceae48bed5204292fc61d73f9f5dbb/src/middleware.ts#L58)
 
 ## Type declaration
 
-| Name                           | Type       | Defined in                                                                                                                                  |
-| ------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| <a id="matcher"></a> `matcher` | `string`[] | [src/middleware.ts:59](https://github.com/Its-Satyajit/nextjs-template/blob/c8d81b09293d759cbf04e9bc7e542cc7d90740e6/src/middleware.ts#L59) |
+| Name                           | Type       | Defined in                                                                                                                              |
+| ------------------------------ | ---------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="matcher"></a> `matcher` | `string`[] | [src/middleware.ts:59](https://github.com/mariolim96/Easy-Check-In/blob/e840a4393cceae48bed5204292fc61d73f9f5dbb/src/middleware.ts#L59) |

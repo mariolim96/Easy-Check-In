@@ -16,7 +16,7 @@ function DropdownMenuCheckboxItem(
 ): ReactNode;
 ```
 
-Defined in: [src/components/ui/dropdown-menu.tsx:96](https://github.com/Its-Satyajit/nextjs-template/blob/c8d81b09293d759cbf04e9bc7e542cc7d90740e6/src/components/ui/dropdown-menu.tsx#L96)
+Defined in: [src/components/ui/dropdown-menu.tsx:96](https://github.com/mariolim96/Easy-Check-In/blob/e840a4393cceae48bed5204292fc61d73f9f5dbb/src/components/ui/dropdown-menu.tsx#L96)
 
 ## Parameters
 

@@ -10,4 +10,4 @@
 const default: NextConfig;
 ```
 
-Defined in: [next.config.ts:5](https://github.com/Its-Satyajit/nextjs-template/blob/c8d81b09293d759cbf04e9bc7e542cc7d90740e6/next.config.ts#L5)
+Defined in: [next.config.ts:5](https://github.com/mariolim96/Easy-Check-In/blob/e840a4393cceae48bed5204292fc61d73f9f5dbb/next.config.ts#L5)

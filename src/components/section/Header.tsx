@@ -60,7 +60,7 @@ export default function Header() {
           ) : (
             <>
               <AuthSignIn.Link>
-                <Button variant={"outline"}>Sign In</Button>
+                <Button variant={"destructive"}>Sign In</Button>
               </AuthSignIn.Link>
               <AuthSignUp.Link>
                 <Button variant={"default"}>Sign Up</Button>

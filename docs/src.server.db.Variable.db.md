@@ -10,4 +10,4 @@
 const db: PostgresJsDatabase<src/server/db/schemas> & object;
 ```
 
-Defined in: [src/server/db/index.ts:19](https://github.com/Its-Satyajit/nextjs-template/blob/c8d81b09293d759cbf04e9bc7e542cc7d90740e6/src/server/db/index.ts#L19)
+Defined in: [src/server/db/index.ts:19](https://github.com/mariolim96/Easy-Check-In/blob/e840a4393cceae48bed5204292fc61d73f9f5dbb/src/server/db/index.ts#L19)

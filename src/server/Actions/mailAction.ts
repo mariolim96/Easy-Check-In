@@ -30,8 +30,14 @@ export async function sendMail({
   html: string;
 }): Promise<void> {
   const transporter = nodemailer.createTransport({
-    service: process.env.MAIL_HOST,
-    auth: { user: env.MAIL_USERNAME, pass: env.MAIL_PASSWORD },
+    host: env.MAIL_HOST,
+    // this for localhost 2 param
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: env.MAIL_USERNAME,
+      pass: env.MAIL_PASSWORD,
+    },
   });
 
   const mailOptions = {

@@ -10,7 +10,7 @@
 function AuthSignIn(p?: object, search?: object): string;
 ```
 
-Defined in: [src/routes/index.ts:35](https://github.com/Its-Satyajit/nextjs-template/blob/c8d81b09293d759cbf04e9bc7e542cc7d90740e6/src/routes/index.ts#L35)
+Defined in: [src/routes/index.ts:35](https://github.com/mariolim96/Easy-Check-In/blob/e840a4393cceae48bed5204292fc61d73f9f5dbb/src/routes/index.ts#L35)
 
 ## Parameters
 

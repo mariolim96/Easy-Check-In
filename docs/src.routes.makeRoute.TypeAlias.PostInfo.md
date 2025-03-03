@@ -10,7 +10,7 @@
 type PostInfo<Body, Result> = object;
 ```
 
-Defined in: [src/routes/makeRoute.tsx:28](https://github.com/Its-Satyajit/nextjs-template/blob/c8d81b09293d759cbf04e9bc7e542cc7d90740e6/src/routes/makeRoute.tsx#L28)
+Defined in: [src/routes/makeRoute.tsx:28](https://github.com/mariolim96/Easy-Check-In/blob/e840a4393cceae48bed5204292fc61d73f9f5dbb/src/routes/makeRoute.tsx#L28)
 
 ## Type Parameters
 
@@ -21,8 +21,8 @@ Defined in: [src/routes/makeRoute.tsx:28](https://github.com/Its-Satyajit/nextjs
 
 ## Type declaration
 
-| Name                                    | Type     | Defined in                                                                                                                                                |
-| --------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| <a id="body"></a> `body`                | `Body`   | [src/routes/makeRoute.tsx:29](https://github.com/Its-Satyajit/nextjs-template/blob/c8d81b09293d759cbf04e9bc7e542cc7d90740e6/src/routes/makeRoute.tsx#L29) |
-| <a id="result"></a> `result`            | `Result` | [src/routes/makeRoute.tsx:30](https://github.com/Its-Satyajit/nextjs-template/blob/c8d81b09293d759cbf04e9bc7e542cc7d90740e6/src/routes/makeRoute.tsx#L30) |
-| <a id="description"></a> `description`? | `string` | [src/routes/makeRoute.tsx:31](https://github.com/Its-Satyajit/nextjs-template/blob/c8d81b09293d759cbf04e9bc7e542cc7d90740e6/src/routes/makeRoute.tsx#L31) |
+| Name                                    | Type     | Defined in                                                                                                                                            |
+| --------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="body"></a> `body`                | `Body`   | [src/routes/makeRoute.tsx:29](https://github.com/mariolim96/Easy-Check-In/blob/e840a4393cceae48bed5204292fc61d73f9f5dbb/src/routes/makeRoute.tsx#L29) |
+| <a id="result"></a> `result`            | `Result` | [src/routes/makeRoute.tsx:30](https://github.com/mariolim96/Easy-Check-In/blob/e840a4393cceae48bed5204292fc61d73f9f5dbb/src/routes/makeRoute.tsx#L30) |
+| <a id="description"></a> `description`? | `string` | [src/routes/makeRoute.tsx:31](https://github.com/mariolim96/Easy-Check-In/blob/e840a4393cceae48bed5204292fc61d73f9f5dbb/src/routes/makeRoute.tsx#L31) |
