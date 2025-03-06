@@ -1,44 +1,27 @@
 "use client";
-import {
-  Building2,
-  Home,
-  Users,
-  Wrench,
-  BarChart3,
-  FileText,
-  Settings,
-} from "lucide-react";
+import { Building2, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import Link, { LinkProps } from "next/link";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
+// Import the typed routes
+import { Home as HomeRoute, Properties } from "@/routes";
+import type { RouteBuilder } from "@/routes/makeRoute";
 
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   links?: {
     label: string;
-    href: string;
+    route: RouteBuilder<any, any>; // Use RouteBuilder type instead of raw href
     icon: React.JSX.Element | React.ReactNode;
   }[];
 }
 
-// import { Menu, X } from "lucide-react";
-
 interface Links {
   label: string;
-  href: string;
+  route: RouteBuilder<any, any>; // Use RouteBuilder type instead of raw href
   icon: React.JSX.Element | React.ReactNode;
 }
 
@@ -46,15 +29,14 @@ export const SidebarLink = ({
   link,
   open,
   className,
-  ...props
 }: {
   link: Links;
   open: boolean;
   className?: string;
-  props?: LinkProps;
 }) => {
   return (
-    <Link href={link.href} className={cn("", className)} {...props}>
+    // Use the typed Link component from the route
+    <link.route.Link className={cn("", className)}>
       <Button
         variant="ghost"
         className="group/sidebar m-0 flex w-full items-center justify-start gap-2 p-0 py-2"
@@ -71,7 +53,7 @@ export const SidebarLink = ({
           {link.label}
         </motion.span>
       </Button>
-    </Link>
+    </link.route.Link>
   );
 };
 
@@ -107,38 +89,13 @@ export default function Sidebar({
   const currentLinks = links ?? [
     {
       label: "Overview",
-      href: "/",
+      route: HomeRoute,
       icon: <Home className="mr-2 !size-6" />,
     },
     {
       label: "Properties",
-      href: "/properties",
+      route: Properties,
       icon: <Building2 className="mr-2 !size-6" />,
-    },
-    {
-      label: "Tenants",
-      href: "/tenants",
-      icon: <Users className="mr-2 !size-6" />,
-    },
-    {
-      label: "Maintenance",
-      href: "/maintenance",
-      icon: <Wrench className="mr-2 !size-6" />,
-    },
-    {
-      label: "Finances",
-      href: "/finances",
-      icon: <BarChart3 className="mr-2 !size-6" />,
-    },
-    {
-      label: "Documents",
-      href: "/documents",
-      icon: <FileText className="mr-2 !size-6" />,
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-      icon: <Settings className="mr-2 !size-6" />,
     },
   ];
   const [open, setOpen] = useState(false);
@@ -153,59 +110,27 @@ export default function Sidebar({
         width: open ? "300px" : "60px",
       }}
     >
-      <div className="pl-2">{<Logo open={open} />}</div>
+      <div className="pl-2">
+        <Logo open={open} />
+      </div>
       <nav className="flex-1 px-4 py-2">
         {currentLinks.map((link) => (
           <SidebarLink key={link.label} link={link} open={open} />
         ))}
       </nav>
-      {/* <div className="border-t p-4">
-        <div className="flex items-center gap-3">
-          <Avatar>
-            <AvatarImage src="/placeholder.svg?height=32&width=32" />
-            <AvatarFallback>JD</AvatarFallback>
-          </Avatar>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium">John Doe</p>
-            <p className="truncate text-xs text-muted-foreground">
-              john@example.com
-            </p>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div> */}
     </motion.div>
   );
 }
 
 export const Logo = ({ open }: { open: boolean }) => {
   return (
-    <Link
-      href="#"
-      className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
-    >
-      <img
+    <HomeRoute.Link className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black">
+      <Image
+        src="/images/icona.png"
+        alt="Logo"
+        width={40}
+        height={40}
         className="aspect-square h-10 w-10"
-        alt="@shadcn"
-        src="\images\icona.png"
       />
       <motion.span
         initial={{ opacity: 0 }}
@@ -216,6 +141,6 @@ export const Logo = ({ open }: { open: boolean }) => {
       >
         EasyCheckIn
       </motion.span>
-    </Link>
+    </HomeRoute.Link>
   );
 };
