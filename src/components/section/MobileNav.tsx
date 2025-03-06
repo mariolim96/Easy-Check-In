@@ -1,18 +1,18 @@
 "use client";
 
+import { Home, Building2, Users, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Home, Building2, FileText, Send } from "lucide-react";
 
-type MobileNavProps = {
+interface MobileNavProps {
   setActiveTab: (tab: string) => void;
-};
+}
 
 export default function MobileNav({ setActiveTab }: MobileNavProps) {
   return (
     <nav className="fixed bottom-0 left-0 right-0 flex h-16 items-center justify-around border-t bg-background md:hidden">
       <Button
         variant="ghost"
-        className="flex flex-1 flex-col items-center py-2 pt-10"
+        className="flex flex-1 flex-col items-center py-2"
         onClick={() => setActiveTab("overview")}
       >
         <Home className="h-5 w-5" />
@@ -20,27 +20,27 @@ export default function MobileNav({ setActiveTab }: MobileNavProps) {
       </Button>
       <Button
         variant="ghost"
-        className="flex flex-1 flex-col items-center py-2 pt-10"
-        onClick={() => setActiveTab("guests")}
+        className="flex flex-1 flex-col items-center py-2"
+        onClick={() => setActiveTab("properties")}
       >
         <Building2 className="h-5 w-5" />
-        <span className="mt-1 text-xs">Guests</span>
+        <span className="mt-1 text-xs">Properties</span>
       </Button>
       <Button
         variant="ghost"
-        className="flex flex-1 flex-col items-center py-2 pt-10"
-        onClick={() => setActiveTab("documents")}
+        className="flex flex-1 flex-col items-center py-2"
+        onClick={() => setActiveTab("tenants")}
       >
-        <FileText className="h-5 w-5" />
-        <span className="mt-1 text-xs">Documents</span>
+        <Users className="h-5 w-5" />
+        <span className="mt-1 text-xs">Tenants</span>
       </Button>
       <Button
         variant="ghost"
-        className="flex flex-1 flex-col items-center py-2 pt-10"
-        onClick={() => setActiveTab("alloggiatiweb")}
+        className="flex flex-1 flex-col items-center py-2"
+        onClick={() => setActiveTab("maintenance")}
       >
-        <Send className="h-5 w-5" />
-        <span className="mt-1 text-xs">AlloggiatiWeb</span>
+        <Wrench className="h-5 w-5" />
+        <span className="mt-1 text-xs">Maintenance</span>
       </Button>
     </nav>
   );

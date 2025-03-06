@@ -72,3 +72,27 @@ export default function Header() {
     </div>
   );
 }
+
+// "use client";
+
+// import { Bell } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+// export default function Header() {
+//   return (
+//     <header className="flex h-16 items-center border-b bg-card px-4 md:px-6">
+//       <div className="flex flex-1 items-center gap-4 md:ml-auto">
+//         <Button variant="outline" size="icon" className="relative">
+//           <Bell className="h-4 w-4" />
+//           <span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-primary"></span>
+//           <span className="sr-only">Notifications</span>
+//         </Button>
+//         <Avatar className="md:hidden">
+//           <AvatarImage src="/placeholder.svg?height=32&width=32" />
+//           <AvatarFallback>JD</AvatarFallback>
+//         </Avatar>
+//       </div>
+//     </header>
+//   );
+// }

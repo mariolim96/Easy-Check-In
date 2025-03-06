@@ -3,13 +3,11 @@ import "@/styles/globals.css";
 import type { Metadata } from "next";
 
 import ReactQueryProvider from "@/components/providers/ReactQuery";
-import Footer from "@/components/section/Footer";
-import Header from "@/components/section/Header";
 import { Toaster } from "@/components/ui/sonner";
 import env from "@/env";
 import { R, RI } from "@/styles/Fonts";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { Layout } from "@/components/templates/Layout";
+import { DashboardLayout as Layout } from "@/components/templates/Layout";
 
 export const metadata: Metadata = {
   title: "Create Next App",

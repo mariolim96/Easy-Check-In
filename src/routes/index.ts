@@ -15,6 +15,10 @@ import * as AuthSignUpRoute from "@/app/(auth)/sign-up/page.info";
 import * as DashboardAdminRoute from "@/app/(dashboard)/admin/page.info";
 import * as DashboardUserRoute from "@/app/(dashboard)/user/page.info";
 import * as ApiAuthAllRoute from "@/app/api/auth/[...all]/route.info";
+import * as PropertiesApiRoute from "@/app/api/properties/route.info";
+import * as PropertyApiRoute from "@/app/api/properties/[propertyId]/route.info";
+import * as PropertiesRoute from "@/app/properties/page.info";
+import * as PropertyDetailRoute from "@/app/properties/[propertyId]/page.info";
 
 export const Home = makeRoute("/", {
   ...defaultInfo,
@@ -51,4 +55,20 @@ export const DashboardUser = makeRoute("/(dashboard)/user", {
 export const ApiAuthAll = makeRoute("/api/auth/[...all]", {
   ...defaultInfo,
   ...ApiAuthAllRoute.Route,
+});
+export const PropertiesApi = makeRoute("/api/properties", {
+  ...defaultInfo,
+  ...PropertiesApiRoute.Route,
+});
+export const PropertyApi = makeRoute("/api/properties/[propertyId]", {
+  ...defaultInfo,
+  ...PropertyApiRoute.Route,
+});
+export const Properties = makeRoute("/properties", {
+  ...defaultInfo,
+  ...PropertiesRoute.Route,
+});
+export const PropertyDetail = makeRoute("/properties/[propertyId]", {
+  ...defaultInfo,
+  ...PropertyDetailRoute.Route,
 });
