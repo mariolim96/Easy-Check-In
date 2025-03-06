@@ -65,6 +65,9 @@ importers:
       drizzle-orm:
         specifier: ^0.38.4
         version: 0.38.4(@types/react@19.0.7)(kysely@0.27.5)(postgres@3.4.5)(react@19.0.0)
+      encore.dev:
+        specifier: ^1.46.6
+        version: 1.46.6
       framer-motion:
         specifier: ^12.4.10
         version: 12.4.10(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -1830,6 +1833,10 @@ packages:
 
   enabled@2.0.0:
     resolution: {integrity: sha512-AKrN98kuwOzMIdAizXGI86UFBoo26CL21UM763y1h/GMSJ4/OHU9k2YlsmBpyScFo/wbLzWQJBMCW4+IO3/+OQ==}
+
+  encore.dev@1.46.6:
+    resolution: {integrity: sha512-LX2eZXCdiF1qV9vvchZlx5RXU4I8c1AtFPVStAT0bo4YBT1mTGB+JJkl1q7NMr4yzFW+gJtFJONyb3hDyZcE7w==}
+    engines: {node: '>=18.0.0'}
 
   enhanced-resolve@5.18.0:
     resolution: {integrity: sha512-0/r0MySGYG8YqlayBZ6MuCfECmHFdJ5qyPh8s8wa5Hnm6SaFLSK1VYCbj+NKp090Nm1caZhD+QTnmxO7esYGyQ==}
@@ -4840,6 +4847,8 @@ snapshots:
   emoji-regex@9.2.2: {}
 
   enabled@2.0.0: {}
+
+  encore.dev@1.46.6: {}
 
   enhanced-resolve@5.18.0:
     dependencies:

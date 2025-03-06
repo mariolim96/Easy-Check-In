@@ -9,12 +9,12 @@ import { AuthSignIn, Home } from "./routes";
 const authRoutes = ["/sign-in", "/sign-up"];
 const passwordRoutes = ["/reset-password", "/forgot-password"];
 const adminRoutes = ["/admin"];
-
+const publicRoutes = [Home()];
 export default async function authMiddleware(request: NextRequest) {
   const pathName = request.nextUrl.pathname;
 
   // Allow public access to the root path
-  if (pathName === Home()) {
+  if (publicRoutes.includes(pathName)) {
     return NextResponse.next();
   }
 

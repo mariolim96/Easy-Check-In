@@ -22,7 +22,8 @@
     "dr:build": "npx declarative-routing build",
     "dr:build:watch": "npx declarative-routing build --watch",
     "format:write:watch": "pnpm onchange -j 12 -d 1500 -f change -f add  \"**/*\" --exclude-path .gitignore -- prettier -w \"**/*.{ts,tsx,js,jsx,mdx,cjs,mjs,json}\" --cache --log-level warn",
-    "dev": "concurrently -c \"#604CC3, #8FD14F ,#FF6600,#FFA600\" \"pnpm dev:turbo\" \"pnpm dr:build:watch\" \"pnpm format:write:watch\"  --names \"Next.js,Routing,Prettier\""
+    "dev": "concurrently -c \"#604CC3, #8FD14F ,#FF6600,#FFA600\" \"pnpm dev:turbo\" \"pnpm dr:build:watch\" \"pnpm format:write:watch\"  --names \"Next.js,Routing,Prettier\"",
+    "be:gen": "encore gen client app-29ei --output=./src/lib/api-client.ts --env=local"
   },
   "dependencies": {
     "@better-fetch/fetch": "^1.1.12",
@@ -44,6 +45,7 @@
     "clsx": "^2.1.1",
     "declarative-routing": "^0.1.20",
     "drizzle-orm": "^0.38.4",
+    "encore.dev": "^1.46.6",
     "framer-motion": "^12.4.10",
     "lucide-react": "^0.473.0",
     "motion": "^12.4.10",

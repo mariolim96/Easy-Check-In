@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "instructions": {
+    "files": [
+      ".augment/instructions.md"
+    ]
+  },
+  "project": {
+    "name": "Easy-Check-In",
+    "type": "web-application",
+    "mainLanguage": "typescript",
+    "frameworks": {
+      "frontend": "next.js",
+      "backend": "encore",
+      "testing": ["vitest", "cypress"]
+    }
+  },
+  "codeAnalysis": {
+    "linting": {
+      "typescript": true,
+      "eslint": true
+    },
+    "formatting": {
+      "prettier": true
+    }
+  },
+  "conventions": {
+    "commits": "conventional-commits",
+    "branchNaming": "feature/*",
+    "versioning": "semver"
+  }
+}
