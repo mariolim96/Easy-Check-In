@@ -46,7 +46,7 @@ export default function PropertyDetailPage() {
           <CardContent>
             <div className="prose max-w-none">
               <p>{property.description}</p>
-              
+
               <div className="mt-6 grid grid-cols-2 gap-4">
                 <div>
                   <h3 className="text-lg font-semibold">Details</h3>
@@ -58,7 +58,7 @@ export default function PropertyDetailPage() {
                     <li>Year Built: {property.yearBuilt}</li>
                   </ul>
                 </div>
-                
+
                 <div>
                   <h3 className="text-lg font-semibold">Amenities</h3>
                   <ul className="mt-2 space-y-2">
@@ -81,7 +81,9 @@ export default function PropertyDetailPage() {
             <p className="text-2xl font-bold">{property.price}</p>
             <div className="mt-6 space-y-4">
               <Button className="w-full">Schedule Viewing</Button>
-              <Button variant="outline" className="w-full">Contact Agent</Button>
+              <Button variant="outline" className="w-full">
+                Contact Agent
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -95,7 +97,7 @@ export default function PropertyDetailPage() {
           </CardHeader>
           <CardContent>
             {/* Add a map component here */}
-            <div className="h-[300px] bg-muted flex items-center justify-center">
+            <div className="flex h-[300px] items-center justify-center bg-muted">
               Map placeholder
             </div>
           </CardContent>

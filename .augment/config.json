@@ -1,9 +1,7 @@
 {
   "version": "1.0",
   "instructions": {
-    "files": [
-      ".augment/instructions.md"
-    ]
+    "files": [".augment/instructions.md"]
   },
   "project": {
     "name": "Easy-Check-In",

@@ -11,12 +11,22 @@ import { PropertyCard } from "@/components/property-card";
 export default function PropertiesPage() {
   const searchParams = useSearchParams(Properties);
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // Mock data - replace with actual API call
   const properties = [
-    { id: "1", name: "Luxury Apartment", type: "apartment", location: "Downtown" },
+    {
+      id: "1",
+      name: "Luxury Apartment",
+      type: "apartment",
+      location: "Downtown",
+    },
     { id: "2", name: "Family House", type: "house", location: "Suburbs" },
-    { id: "3", name: "Studio Flat", type: "apartment", location: "City Center" },
+    {
+      id: "3",
+      name: "Studio Flat",
+      type: "apartment",
+      location: "City Center",
+    },
   ];
 
   return (
@@ -35,9 +45,7 @@ export default function PropertiesPage() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="max-w-sm"
         />
-        <Button variant="outline">
-          Filter
-        </Button>
+        <Button variant="outline">Filter</Button>
       </div>
 
       {/* Properties Grid */}
@@ -49,7 +57,9 @@ export default function PropertiesPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">Type: {property.type}</p>
-              <p className="text-muted-foreground">Location: {property.location}</p>
+              <p className="text-muted-foreground">
+                Location: {property.location}
+              </p>
               <div className="mt-4">
                 <PropertyCard propertyId={property.id} />
               </div>
