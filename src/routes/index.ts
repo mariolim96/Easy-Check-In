@@ -14,7 +14,6 @@ import * as AuthSignInRoute from "@/app/(auth)/sign-in/page.info";
 import * as AuthSignUpRoute from "@/app/(auth)/sign-up/page.info";
 import * as DashboardAdminRoute from "@/app/(dashboard)/admin/page.info";
 import * as DashboardUserRoute from "@/app/(dashboard)/user/page.info";
-import * as ApiAuthAllRoute from "@/app/api/auth/[...all]/route.info";
 import * as PropertiesRoute from "@/app/properties/page.info";
 import * as PropertyDetailRoute from "@/app/properties/[propertyId]/page.info";
 
@@ -49,10 +48,6 @@ export const DashboardAdmin = makeRoute("/(dashboard)/admin", {
 export const DashboardUser = makeRoute("/(dashboard)/user", {
   ...defaultInfo,
   ...DashboardUserRoute.Route,
-});
-export const ApiAuthAll = makeRoute("/api/auth/[...all]", {
-  ...defaultInfo,
-  ...ApiAuthAllRoute.Route,
 });
 export const Properties = makeRoute("/properties", {
   ...defaultInfo,
