@@ -18,8 +18,8 @@ const env = createEnv({
     MAIL_PASSWORD: z.string(),
     MAIL_FROM: z.string().email(),
 
-    GITHUB_CLIENT_ID: z.string(),
-    GITHUB_CLIENT_SECRET: z.string(),
+    // GITHUB_CLIENT_ID: z.string(),
+    // GITHUB_CLIENT_SECRET: z.string(),
     EMAIL_VERIFICATION_CALLBACK_URL: z.string(),
   },
 
@@ -43,8 +43,8 @@ const env = createEnv({
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
     NEXT_PUBLIC_BETTER_AUTH_URL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
 
-    GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
-    GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+    // GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+    // GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     EMAIL_VERIFICATION_CALLBACK_URL:
       process.env.EMAIL_VERIFICATION_CALLBACK_URL,
 

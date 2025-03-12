@@ -19,4 +19,5 @@
   //     "titleBar.inactiveForeground": "#e7e7e799"
   //   },
   //   "peacock.color": "#1b1dea"
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true
 }

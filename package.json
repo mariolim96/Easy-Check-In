@@ -23,7 +23,7 @@
     "dr:build:watch": "npx declarative-routing build --watch",
     "format:write:watch": "pnpm onchange -j 12 -d 1500 -f change -f add  \"**/*\" --exclude-path .gitignore -- prettier -w \"**/*.{ts,tsx,js,jsx,mdx,cjs,mjs,json}\" --cache --log-level warn",
     "dev": "concurrently -c \"#604CC3, #8FD14F ,#FF6600,#FFA600\" \"pnpm dev:turbo\" \"pnpm dr:build:watch\" \"pnpm format:write:watch\"  --names \"Next.js,Routing,Prettier\"",
-    "be:gen": "encore gen client --output=./src/lib/api-client.ts --env=local",
+    "be:gen": "encore gen client eci-6kci --output=./src/lib/encore-client.ts --env=local",
     "be:run": "encore run"
   },
   "dependencies": {
@@ -46,7 +46,7 @@
     "clsx": "^2.1.1",
     "declarative-routing": "^0.1.20",
     "drizzle-orm": "^0.38.4",
-    "encore.dev": "^1.46.6",
+    "encore.dev": "^1.46.7",
     "framer-motion": "^12.4.10",
     "lucide-react": "^0.473.0",
     "motion": "^12.4.10",
@@ -73,6 +73,7 @@
     "@tanstack/eslint-plugin-query": "^5.62.16",
     "@types/node": "^22.10.7",
     "@types/nodemailer": "^6.4.17",
+    "@types/pg": "^8.11.11",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "@typescript-eslint/eslint-plugin": "^8.20.0",
@@ -84,6 +85,7 @@
     "eslint-config-next": "15.1.5",
     "eslint-plugin-drizzle": "^0.2.3",
     "onchange": "^7.1.0",
+    "pg": "^8.13.3",
     "postcss": "^8.5.1",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.10",

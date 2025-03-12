@@ -1,18 +1,6 @@
 // database.ts
-import { api } from "encore.dev/api";
 import { SQLDatabase } from "encore.dev/storage/sqldb";
-import { drizzle } from "drizzle-orm/node-postgres";
 
-// Create SQLDatabase instance with migrations configuration
-const db = new SQLDatabase("test", {
-  migrations: {
-    path: "schemas", // Point to migrations directory
-    source: "drizzle",
-  },
-});
+export const UserDB = new SQLDatabase("UserDB", { migrations: "./migrations" });
 
-// Initialize Drizzle ORM with the connection string
-export const orm = drizzle(db.connectionString);
-
-// Query all users
-// await orm.select().from(users);
+// export const profilePictures = new Bucket("profile-pictures", {versioned: false, public: false});

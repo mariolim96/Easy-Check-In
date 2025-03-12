@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { betterFetch } from "@better-fetch/fetch";
 
 import env from "./env";
-import type { Session } from "./lib/auth";
+// import type { Session } from "./lib/auth";
 import { AuthSignIn, Home } from "./routes";
 
 const authRoutes = ["/sign-in", "/sign-up"];
@@ -23,15 +23,14 @@ export default async function authMiddleware(request: NextRequest) {
   //   const isAdminRoute = adminRoutes.includes(pathName);
 
   //   // Fetch the session to check authentication and role
-  //   const { data: session } = await betterFetch<Session>(
-  //     "/api/auth/get-session",
-  //     {
-  //       baseURL: env.BETTER_AUTH_URL,
-  //       headers: {
-  //         cookie: request.headers.get("cookie") ?? "",
-  //       },
-  //     },
-  //   );
+  debugger;
+  const { data: session } = await betterFetch<any>("/api/auth/get-session", {
+    baseURL: env.BETTER_AUTH_URL,
+    headers: {
+      cookie: request.headers.get("cookie") ?? "",
+    },
+  });
+  console.log(session);
 
   //   // If no session exists and the route is not an auth or password route, redirect to sign-in
   //   if (!session) {

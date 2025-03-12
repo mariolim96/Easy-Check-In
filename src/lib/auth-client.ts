@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/react";
-
+import { Local } from "./encore-client";
 import env from "@/env";
 
 export const {
@@ -10,5 +10,5 @@ export const {
   forgetPassword,
   resetPassword,
 } = createAuthClient({
-  baseURL: env.NEXT_PUBLIC_BETTER_AUTH_URL,
+  baseURL: Local,
 });
