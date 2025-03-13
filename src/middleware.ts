@@ -4,12 +4,15 @@ import { betterFetch } from "@better-fetch/fetch";
 
 import env from "./env";
 // import type { Session } from "./lib/auth";
-import { AuthSignIn, Home } from "./routes";
+// import { AuthSignIn, Home } from "./routes";
 
-const authRoutes = ["/sign-in", "/sign-up"];
-const passwordRoutes = ["/reset-password", "/forgot-password"];
-const adminRoutes = ["/admin"];
-const publicRoutes = [Home()];
+// const authRoutes = ["/sign-in", "/sign-up"];
+// const passwordRoutes = ["/reset-password", "/forgot-password"];
+// const adminRoutes = ["/admin"];
+// const publicRoutes = [Home()];
+type session = {
+    name: string
+}
 export default async function authMiddleware(request: NextRequest) {
   //   const pathName = request.nextUrl.pathname;
 
@@ -24,7 +27,7 @@ export default async function authMiddleware(request: NextRequest) {
 
   //   // Fetch the session to check authentication and role
   debugger;
-  const { data: session } = await betterFetch<any>("/api/auth/get-session", {
+  const { data: session } = await betterFetch<session>("/api/auth/get-session", {
     baseURL: env.BETTER_AUTH_URL,
     headers: {
       cookie: request.headers.get("cookie") ?? "",

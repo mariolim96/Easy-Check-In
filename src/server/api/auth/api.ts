@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 import { api } from "encore.dev/api";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./encore.service";

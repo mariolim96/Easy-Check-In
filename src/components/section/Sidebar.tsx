@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Building2, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -82,8 +83,6 @@ export const DesktopSidebar = ({
 };
 
 export default function Sidebar({
-  activeTab,
-  setActiveTab,
   links,
 }: SidebarProps) {
   const currentLinks = links ?? [

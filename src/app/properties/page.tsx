@@ -1,6 +1,6 @@
 "use client";
 
-import { Properties, PropertyApi } from "@/routes";
+import { Properties } from "@/routes";
 import { useSearchParams } from "@/routes/hooks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,6 @@ import { useState } from "react";
 import { PropertyCard } from "@/components/property-card";
 
 export default function PropertiesPage() {
-  const searchParams = useSearchParams(Properties);
   const [searchTerm, setSearchTerm] = useState("");
 
   // Mock data - replace with actual API call
