@@ -23,11 +23,12 @@ import { signInSchema } from "@/zod/zod";
 import type { ErrorContext } from "@better-fetch/fetch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SiGithub } from "@icons-pack/react-simple-icons";
+import { useState } from "react";
 
 export default function SignIn() {
   const router = useRouter();
 
-  // const [pendingCredentials, setPendingCredentials] = useState(false);
+  const [pendingCredentials, setPendingCredentials] = useState(false);
   // const [pendingGithub, setPendingGithub] = useState(false);
 
   const form = useForm<z.infer<typeof signInSchema>>({
@@ -48,23 +49,32 @@ export default function SignIn() {
       },
       {
         onRequest: () => {
-          // setPendingCredentials(true);
+          setPendingCredentials(true);
         },
-        onSuccess: async () => {
+        onSuccess: async (response) => {
+          console.log("response:", response);
+          //   if (!response?.emailVerified) {
+          //   }
           router.push(Home());
           router.refresh();
           toast.success("Successfully signed in!", {
             description: "You have successfully signed in!",
           });
         },
-        onError: (ctx: ErrorContext) => {
+        // onError: (ctx: ErrorContext) => {
+        //   toast.error("Something went wrong!", {
+        //     description: ctx.error.message ?? "Something went wrong.",
+        //   });
+        //   return ''
+        // },
+        onError: (ctx) => {
           toast.error("Something went wrong!", {
             description: ctx.error.message ?? "Something went wrong.",
           });
         },
       },
     );
-    // setPendingCredentials(false);
+    setPendingCredentials(false);
   };
 
   const handleSignInWithGithub = async () => {

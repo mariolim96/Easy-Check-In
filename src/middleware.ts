@@ -2,19 +2,38 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { betterFetch } from "@better-fetch/fetch";
 
-import env from "./env";
-// import type { Session } from "./lib/auth";
+// import env from "./env";
+// // import type { Session } from "./lib/auth";
 // import { AuthSignIn, Home } from "./routes";
+import authClient from "./lib/auth-client"; // Adjust the import path as necessary
+import { Local } from "./lib/encore-client";
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image: string | null;
+  createdAt: string;
+  updatedAt: string;
+  role: string;
+  banned: boolean;
+  banReason: string | null;
+  banExpires: string | null;
+}
 
+export interface Session {
+  user: User;
+}
 // const authRoutes = ["/sign-in", "/sign-up"];
 // const passwordRoutes = ["/reset-password", "/forgot-password"];
 // const adminRoutes = ["/admin"];
 // const publicRoutes = [Home()];
-type session = {
-    name: string
-}
 export default async function authMiddleware(request: NextRequest) {
-  //   const pathName = request.nextUrl.pathname;
+//   const session = await authClient.getSession();
+  
+  
+//   console.log(' session:', session);
+
 
   //   // Allow public access to the root path
   //   if (publicRoutes.includes(pathName)) {
@@ -26,14 +45,16 @@ export default async function authMiddleware(request: NextRequest) {
   //   const isAdminRoute = adminRoutes.includes(pathName);
 
   //   // Fetch the session to check authentication and role
-  debugger;
-  const { data: session } = await betterFetch<session>("/api/auth/get-session", {
-    baseURL: env.BETTER_AUTH_URL,
-    headers: {
-      cookie: request.headers.get("cookie") ?? "",
+//   debugger;
+  const { data: session } = await betterFetch<Session>(
+    "/api/auth/get-session",
+    {
+      baseURL: Local,
+      headers: {
+        cookie: request.headers.get("cookie") ?? "",
+      },
     },
-  });
-  console.log(session);
+  );
 
   //   // If no session exists and the route is not an auth or password route, redirect to sign-in
   //   if (!session) {

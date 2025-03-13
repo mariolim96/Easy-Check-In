@@ -1,7 +1,9 @@
 import { createAuthClient } from "better-auth/react";
-import { Local } from "./encore-client";
-import env from "@/env";
+// import { Local } from "./encore-client";
 
+const client = createAuthClient({
+  baseURL: "http://localhost:4000"
+});
 export const {
   signIn,
   signUp,
@@ -9,6 +11,6 @@ export const {
   signOut,
   forgetPassword,
   resetPassword,
-} = createAuthClient({
-  baseURL: Local,
-});
+} = client;
+
+export default client;
