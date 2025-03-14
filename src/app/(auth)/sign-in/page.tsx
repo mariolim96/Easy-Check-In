@@ -67,9 +67,9 @@ export default function SignIn() {
         //   });
         //   return ''
         // },
-        onError: (ctx) => {
+        onError: (context: ErrorContext): void | Promise<void> => {
           toast.error("Something went wrong!", {
-            description: ctx.error.message ?? "Something went wrong.",
+            description: context.error.message ?? "Something went wrong.",
           });
         },
       },

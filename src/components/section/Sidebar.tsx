@@ -82,9 +82,7 @@ export const DesktopSidebar = ({
   );
 };
 
-export default function Sidebar({
-  links,
-}: SidebarProps) {
+export default function Sidebar({ links }: SidebarProps) {
   const currentLinks = links ?? [
     {
       label: "Overview",

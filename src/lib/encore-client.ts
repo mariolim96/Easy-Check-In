@@ -16,7 +16,7 @@ export const Local: BaseURL = "http://localhost:4000";
  * Environment returns a BaseURL for calling the cloud environment with the given name.
  */
 export function Environment(name: string): BaseURL {
-  return `https://${name}-eci-dev.encr.app`;
+  return `https://${name}-eci-6kci.encr.app`;
 }
 
 /**
@@ -27,10 +27,11 @@ export function PreviewEnv(pr: number | string): BaseURL {
 }
 
 /**
- * Client is an API client for the eci-dev Encore application.
+ * Client is an API client for the eci-6kci Encore application.
  */
 export default class Client {
   public readonly User: User.ServiceClient;
+  public readonly properties: properties.ServiceClient;
 
   /**
    * Creates a Client for calling the public and authenticated APIs of your Encore application.
@@ -41,6 +42,7 @@ export default class Client {
   constructor(target: BaseURL, options?: ClientOptions) {
     const base = new BaseClient(target, options ?? {});
     this.User = new User.ServiceClient(base);
+    this.properties = new properties.ServiceClient(base);
   }
 }
 
@@ -96,6 +98,54 @@ export namespace User {
         body,
         options,
       );
+    }
+  }
+}
+
+export namespace properties {
+  export interface CreatePropertyParams {
+    userId: string;
+    title: string;
+    description: string;
+    address: string;
+  }
+
+  export interface ListPropertiesResponse {
+    properties: Property[];
+  }
+
+  export interface Property {
+    id: string;
+    userId: string;
+    title: string;
+    description: string;
+    address: string;
+    createdAt: string;
+    disabled: boolean;
+  }
+
+  export class ServiceClient {
+    private baseClient: BaseClient;
+
+    constructor(baseClient: BaseClient) {
+      this.baseClient = baseClient;
+    }
+
+    public async createProperty(params: CreatePropertyParams): Promise<void> {
+      await this.baseClient.callTypedAPI(
+        "POST",
+        `/properties.createProperty`,
+        JSON.stringify(params),
+      );
+    }
+
+    public async listProperties(): Promise<ListPropertiesResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "GET",
+        `/properties.listProperties`,
+      );
+      return (await resp.json()) as ListPropertiesResponse;
     }
   }
 }
@@ -346,7 +396,7 @@ class BaseClient {
     // because browsers do not allow setting User-Agent headers to requests
     if (typeof window === "undefined") {
       this.headers["User-Agent"] =
-        "eci-dev-Generated-TS-Client (Encore/v1.46.7)";
+        "eci-6kci-Generated-TS-Client (Encore/v1.46.7)";
     }
 
     this.requestInit = options.requestInit ?? {};

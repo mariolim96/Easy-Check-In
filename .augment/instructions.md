@@ -33,7 +33,7 @@ This is a property management system built with:
 - Handle errors with try/catch
 
 ## Database
-- PostgreSQL with Prisma as ORM
+- PostgreSQL
 - Follow naming convention: plural, snake_case for tables
 - Include created_at and updated_at in all tables
 

@@ -4,7 +4,7 @@ import { authHandler } from "encore.dev/auth";
 import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins";
 import pg from "pg";
-import { UserDB } from "@/server/db/db";
+import { db } from "@/server/db/db";
 import { sendMail } from "../mail/mail.service";
 
 export default new Service("User");
@@ -63,7 +63,7 @@ export const gateway = new Gateway({ authHandler: handler });
 const { Pool } = pg;
 
 export const auth = betterAuth({
-  database: new Pool({ connectionString: UserDB.connectionString }),
+  database: new Pool({ connectionString: db.connectionString }),
   emailAndPassword: { enabled: true },
   trustedOrigins: [
     "http://localhost:3000",

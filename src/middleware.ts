@@ -29,11 +29,9 @@ export interface Session {
 // const adminRoutes = ["/admin"];
 // const publicRoutes = [Home()];
 export default async function authMiddleware(request: NextRequest) {
-//   const session = await authClient.getSession();
-  
-  
-//   console.log(' session:', session);
+  //   const session = await authClient.getSession();
 
+  //   console.log(' session:', session);
 
   //   // Allow public access to the root path
   //   if (publicRoutes.includes(pathName)) {
@@ -45,7 +43,7 @@ export default async function authMiddleware(request: NextRequest) {
   //   const isAdminRoute = adminRoutes.includes(pathName);
 
   //   // Fetch the session to check authentication and role
-//   debugger;
+  //   debugger;
   const { data: session } = await betterFetch<Session>(
     "/api/auth/get-session",
     {

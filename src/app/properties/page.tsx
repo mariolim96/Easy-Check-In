@@ -1,6 +1,6 @@
 "use client";
 
-import { Properties } from "@/routes";
+import { Properties, CreateProperty } from "@/routes";
 import { useSearchParams } from "@/routes/hooks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,7 +32,9 @@ export default function PropertiesPage() {
     <div className="container mx-auto p-6">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Properties</h1>
-        <Button variant="default">Add New Property</Button>
+        <CreateProperty.ParamsLink>
+          <Button variant="default">Add New Property</Button>
+        </CreateProperty.ParamsLink>
       </div>
 
       {/* Search and Filter Section */}
