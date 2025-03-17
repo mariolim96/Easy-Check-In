@@ -26,6 +26,9 @@ export interface SoapClient extends Client {
     GestioneAppartamenti_SendResult: { ErroreDettaglio: string };
     result: SendFileUnicoResult;
   }>;
+  Tabella(params: TabellaParams): Promise<{
+    TabellaResult: TabellaResult;
+  }>;
 }
 export interface GenerateTokenParams {
   Utente: string;
@@ -107,4 +110,27 @@ export interface SendApartmentResponse {
   schedineValide: number;
   errors: string[];
   success: boolean;
+}
+export type TabellaType =
+  | "Luoghi"
+  | "Tipi_Documento"
+  | "Tipi_Alloggiato"
+  | "TipoErrore"
+  | "ListaAppartamenti";
+
+export interface TabellaParams {
+  Utente: string;
+  token: string;
+  tipo: TabellaType;
+  CSV: string;
+}
+
+export interface TabellaResult {
+  ErroreDettaglio: string;
+  CSV: string;
+}
+
+export interface TabellaResponse {
+  csv: string;
+  error?: string;
 }

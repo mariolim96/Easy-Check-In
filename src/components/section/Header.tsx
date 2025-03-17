@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +11,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { signOut, useSession } from "@/lib/auth-client";
 import { AuthSignIn, AuthSignUp, DashboardAdmin, Home } from "@/routes";
-
 import Logo from "../custom/logo";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -20,6 +18,7 @@ import { Button } from "../ui/button";
 export default function Header() {
   const router = useRouter();
   const { data: session } = useSession();
+  console.log("header session:", session);
   return (
     <div className="sticky top-0 z-50 bg-white/75 shadow backdrop-blur">
       <div className="container mx-auto flex h-12 items-center justify-between">

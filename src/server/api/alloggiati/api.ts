@@ -13,6 +13,8 @@ import {
   type SendFileUnicoResponse,
   type SendApartmentParams,
   type SendApartmentResponse,
+  type TabellaParams,
+  type TabellaResponse,
 } from "./types";
 import {
   generateTokenService,
@@ -21,15 +23,17 @@ import {
   testAuthenticationService,
   sendFileUnicoService,
   sendApartmentService,
+  tabellaService,
 } from "./services";
 
 export const generateToken = api(
   { method: "POST", expose: true },
   async (params: GenerateTokenParams): Promise<GenerateTokenResponse> => {
     const auth = getAuthData();
-    if (!auth?.userID) {
-      throw new Error("User not authenticated");
-    }
+    console.log(" auth:", auth);
+    // if (!auth?.userID) {
+    //   throw new Error("User not authenticated");
+    // }
 
     return await generateTokenService(params);
   },
@@ -48,7 +52,7 @@ export const addApartment = api(
 );
 
 export const disableApartment = api(
-  { method: "POST", expose: true },
+  { method: "POST", expose: true, auth: true },
   async (params: DisableApartmentParams): Promise<DisableApartmentResponse> => {
     const auth = getAuthData();
     if (!auth?.userID) {
@@ -88,11 +92,29 @@ export const sendFileUnico = api(
 export const sendApartment = api(
   { method: "POST", expose: true },
   async (params: SendApartmentParams): Promise<SendApartmentResponse> => {
+    const auth = await getAuthData();
+    if (!auth?.alloggiatiToken) {
+      throw new Error("Not authenticated with Alloggiati");
+    }
+
+    // Use the token in your request
+    const response = await sendApartmentService({
+      ...params,
+      token: auth.alloggiatiToken,
+    });
+
+    return response;
+  },
+);
+
+export const tabella = api(
+  { method: "POST", expose: true },
+  async (params: TabellaParams): Promise<TabellaResponse> => {
     const auth = getAuthData();
     if (!auth?.userID) {
       throw new Error("User not authenticated");
     }
 
-    return await sendApartmentService(params);
+    return await tabellaService(params);
   },
 );

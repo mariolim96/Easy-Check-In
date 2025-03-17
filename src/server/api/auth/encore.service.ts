@@ -15,6 +15,7 @@ interface AuthParams {
 
 interface AuthData {
   userID: string;
+  alloggiatiToken?: string;
 }
 
 interface SessionUser {
@@ -41,7 +42,11 @@ export const handler = authHandler<AuthParams, AuthData>(async (params) => {
     );
 
     const sessionToken = cookieMap["better-auth.session_token"];
+    const alloggiatiToken = cookieMap["alloggiati_token"];
+
     if (!sessionToken) throw APIError.unauthenticated("No session token found");
+    if (!alloggiatiToken)
+      throw APIError.unauthenticated("No alloggiati token found");
 
     const headers = new Headers();
     headers.append("Cookie", `better-auth.session_token=${sessionToken}`);
@@ -52,7 +57,10 @@ export const handler = authHandler<AuthParams, AuthData>(async (params) => {
       throw APIError.unauthenticated("Invalid session");
     }
 
-    return { userID: session.user.id };
+    return {
+      userID: session.user.id,
+      alloggiatiToken,
+    };
   } catch {
     throw APIError.unauthenticated("Invalid session");
   }

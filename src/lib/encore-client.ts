@@ -30,6 +30,7 @@ export function PreviewEnv(pr: number | string): BaseURL {
  * Client is an API client for the eci-6kci Encore application.
  */
 export default class Client {
+  public readonly alloggiati: alloggiati.ServiceClient;
   public readonly User: User.ServiceClient;
   public readonly properties: properties.ServiceClient;
 
@@ -41,6 +42,7 @@ export default class Client {
    */
   constructor(target: BaseURL, options?: ClientOptions) {
     const base = new BaseClient(target, options ?? {});
+    this.alloggiati = new alloggiati.ServiceClient(base);
     this.User = new User.ServiceClient(base);
     this.properties = new properties.ServiceClient(base);
   }
@@ -68,6 +70,189 @@ export interface ClientOptions {
    * a function which returns a new object for each request.
    */
   auth?: auth.AuthParams | AuthDataGenerator;
+}
+
+export namespace alloggiati {
+  export interface AddApartmentParams {
+    Utente: string;
+    token: string;
+    Descrizione: string;
+    ComuneCodice: string;
+    Indirizzo: string;
+    Proprietario: string;
+  }
+
+  export interface AddApartmentResponse {
+    success: boolean;
+    error?: string;
+  }
+
+  export interface AuthenticationTestParams {
+    Utente: string;
+    token: string;
+  }
+
+  export interface AuthenticationTestResponse {
+    ErroreDettaglio: string;
+  }
+
+  export interface DisableApartmentParams {
+    Utente: string;
+    token: string;
+    IdAppartamento: number;
+  }
+
+  export interface DisableApartmentResponse {
+    success: boolean;
+    error?: string;
+  }
+
+  export interface GenerateTokenParams {
+    Utente: string;
+    Password: string;
+    WsKey: string;
+  }
+
+  export interface GenerateTokenResponse {
+    token: string;
+    issued: string;
+    expires: string;
+    error?: string;
+  }
+
+  export interface SendApartmentParams {
+    Utente: string;
+    token: string;
+    ElencoSchedine: string[];
+    IdAppartamento: number;
+  }
+
+  export interface SendApartmentResponse {
+    schedineValide: number;
+    errors: string[];
+    success: boolean;
+  }
+
+  export interface SendFileUnicoParams {
+    Utente: string;
+    token: string;
+    ElencoSchedine: string[];
+  }
+
+  export interface SendFileUnicoResponse {
+    schedineValide: number;
+    errors: string[];
+    success: boolean;
+  }
+
+  export interface TabellaParams {
+    Utente: string;
+    token: string;
+    tipo: TabellaType;
+    CSV: string;
+  }
+
+  export interface TabellaResponse {
+    csv: string;
+    error?: string;
+  }
+
+  export type TabellaType =
+    | "Luoghi"
+    | "Tipi_Documento"
+    | "Tipi_Alloggiato"
+    | "TipoErrore"
+    | "ListaAppartamenti";
+
+  export class ServiceClient {
+    private baseClient: BaseClient;
+
+    constructor(baseClient: BaseClient) {
+      this.baseClient = baseClient;
+    }
+
+    public async addApartment(
+      params: AddApartmentParams,
+    ): Promise<AddApartmentResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/alloggiati.addApartment`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as AddApartmentResponse;
+    }
+
+    public async disableApartment(
+      params: DisableApartmentParams,
+    ): Promise<DisableApartmentResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/alloggiati.disableApartment`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as DisableApartmentResponse;
+    }
+
+    public async generateToken(
+      params: GenerateTokenParams,
+    ): Promise<GenerateTokenResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/alloggiati.generateToken`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as GenerateTokenResponse;
+    }
+
+    public async sendApartment(
+      params: SendApartmentParams,
+    ): Promise<SendApartmentResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/alloggiati.sendApartment`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as SendApartmentResponse;
+    }
+
+    public async sendFileUnico(
+      params: SendFileUnicoParams,
+    ): Promise<SendFileUnicoResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/alloggiati.sendFileUnico`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as SendFileUnicoResponse;
+    }
+
+    public async tabella(params: TabellaParams): Promise<TabellaResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/alloggiati.tabella`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as TabellaResponse;
+    }
+
+    public async testAuthentication(
+      params: AuthenticationTestParams,
+    ): Promise<AuthenticationTestResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/alloggiati.testAuthentication`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as AuthenticationTestResponse;
+    }
+  }
 }
 
 export namespace User {
@@ -104,10 +289,11 @@ export namespace User {
 
 export namespace properties {
   export interface CreatePropertyParams {
-    userId: string;
-    title: string;
-    description: string;
-    address: string;
+    name: string;
+    nomeAlloggiatiWeb: string;
+    rooms: number;
+    beds: number;
+    touristTax: number;
   }
 
   export interface ListPropertiesResponse {
@@ -117,11 +303,13 @@ export namespace properties {
   export interface Property {
     id: string;
     userId: string;
-    title: string;
-    description: string;
-    address: string;
+    name: string;
+    nomeAlloggiatiWeb: string;
+    rooms: number;
+    beds: number;
+    touristTax: number;
+    isActive: boolean;
     createdAt: string;
-    disabled: boolean;
   }
 
   export class ServiceClient {

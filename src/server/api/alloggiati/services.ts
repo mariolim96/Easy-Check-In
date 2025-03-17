@@ -3,6 +3,8 @@ import type {
   SoapClient,
   AuthenticationTestResponse,
   ServiceResult,
+  TabellaParams,
+  TabellaResponse,
 } from "./types";
 
 const WSDL_URL =
@@ -13,17 +15,21 @@ let soapClient: SoapClient | null = null;
 export async function getSoapClient(): Promise<SoapClient | null> {
   if (!soapClient) {
     soapClient = await new Promise<SoapClient>((resolve, reject) => {
-      soap.createClient(WSDL_URL, {}, (err: Error | null, client: soap.Client | undefined) => {
-        if (err) {
-          reject(new Error(err.message || 'Failed to create SOAP client'));
-          return;
-        }
-        if (!client) {
-          reject(new Error('SOAP client is undefined'));
-          return;
-        }
-        resolve(client as unknown as SoapClient);
-      });
+      soap.createClient(
+        WSDL_URL,
+        {},
+        (err: Error | null, client: soap.Client | undefined) => {
+          if (err) {
+            reject(new Error(err.message || "Failed to create SOAP client"));
+            return;
+          }
+          if (!client) {
+            reject(new Error("SOAP client is undefined"));
+            return;
+          }
+          resolve(client as unknown as SoapClient);
+        },
+      );
     });
   }
   return soapClient;
@@ -180,6 +186,22 @@ export async function sendApartmentService(params: {
   };
 }
 
+export async function tabellaService(
+  params: TabellaParams,
+): Promise<TabellaResponse> {
+  const client = await getSoapClient();
+  if (!client) {
+    throw new Error("Failed to create SOAP client");
+  }
+
+  const result = await client.Tabella(params);
+
+  return {
+    csv: result.TabellaResult.CSV,
+    error: result.TabellaResult.ErroreDettaglio || undefined,
+  };
+}
+
 const Services = {
   generateTokenService,
   addApartmentService,
@@ -187,6 +209,7 @@ const Services = {
   testAuthenticationService,
   sendFileUnicoService,
   sendApartmentService,
+  tabellaService,
 };
 
 export default Services;

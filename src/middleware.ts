@@ -1,12 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
-
 import { betterFetch } from "@better-fetch/fetch";
-
 // import env from "./env";
-// // import type { Session } from "./lib/auth";
-// import { AuthSignIn, Home } from "./routes";
-import authClient from "./lib/auth-client"; // Adjust the import path as necessary
 import { Local } from "./lib/encore-client";
+import { AuthalloggiatiLogin, Properties, Home, AuthSignIn } from "./routes";
+
 export interface User {
   id: string;
   name: string;
@@ -24,55 +21,75 @@ export interface User {
 export interface Session {
   user: User;
 }
-// const authRoutes = ["/sign-in", "/sign-up"];
-// const passwordRoutes = ["/reset-password", "/forgot-password"];
-// const adminRoutes = ["/admin"];
-// const publicRoutes = [Home()];
+
+// Define route groups
+const publicRoutes = [Home()];
+const authRoutes = [AuthSignIn()];
+const alloggiatiProtectedRoutes = [Properties()];
+
 export default async function authMiddleware(request: NextRequest) {
-  //   const session = await authClient.getSession();
-
-  //   console.log(' session:', session);
-
+  const pathname = request.nextUrl.pathname;
   //   // Allow public access to the root path
-  //   if (publicRoutes.includes(pathName)) {
-  //     return NextResponse.next();
-  //   }
+  if (publicRoutes.includes(pathname)) {
+    return NextResponse.next();
+  }
 
-  //   const isAuthRoute = authRoutes.includes(pathName);
-  //   const isPasswordRoute = passwordRoutes.includes(pathName);
-  //   const isAdminRoute = adminRoutes.includes(pathName);
+  // Check if user is logged into Alloggiati
+  const alloggiatiToken = request.cookies.get("alloggiati_token")?.value;
+  console.log(" alloggiatiToken:", alloggiatiToken);
+  const alloggiatiUser = request.cookies.get("alloggiati_user")?.value;
+  console.log(" alloggiatiUser:", alloggiatiUser);
 
-  //   // Fetch the session to check authentication and role
+  // If not logged into Alloggiati, redirect to login
   //   debugger;
+  //   if (!alloggiatiToken || !alloggiatiUser) {
+  //     return NextResponse.redirect(new URL(AuthalloggiatiLogin(), request.url));
+  //   }
+  // Allow auth routes
+  if (authRoutes.some((route) => pathname === route)) {
+    return NextResponse.next();
+  }
+
+  // Check main session authentication
   const { data: session } = await betterFetch<Session>(
     "/api/auth/get-session",
     {
       baseURL: Local,
+      credentials: "include",
       headers: {
         cookie: request.headers.get("cookie") ?? "",
       },
     },
   );
+  console.log("session:", session);
+  // If no session exists, redirect to sign-in
+  if (!session) {
+    return NextResponse.redirect(new URL(AuthSignIn(), request.url));
+  }
 
-  //   // If no session exists and the route is not an auth or password route, redirect to sign-in
-  //   if (!session) {
-  //     if (isAuthRoute || isPasswordRoute) {
-  //       return NextResponse.next();
-  //     }
-  //     return NextResponse.redirect(new URL(AuthSignIn(), request.url));
-  //   }
+  // For routes that require Alloggiati authentication
+  if (alloggiatiProtectedRoutes.some((route) => pathname.startsWith(route))) {
+    const alloggiatiToken = request.cookies.get("alloggiati_token")?.value;
 
-  //   // If the user is authenticated but tries to access an auth or password route, redirect to home
-  //   if (isAuthRoute || isPasswordRoute) {
-  //     return NextResponse.redirect(new URL(Home(), request.url));
-  //   }
+    // Check if Alloggiati token exists and is not expired
+    if (!alloggiatiToken) {
+      return NextResponse.redirect(new URL(AuthalloggiatiLogin(), request.url));
+    }
 
-  //   // Restrict access to admin routes based on user role
-  //   if (isAdminRoute && session.user.role !== "admin") {
-  //     return NextResponse.redirect(new URL(Home(), request.url));
-  //   }
+    // Optionally: Check if token is expired
+    const alloggiatiExpires = request.cookies.get("alloggiati_expires")?.value;
+    if (alloggiatiExpires && new Date(alloggiatiExpires) < new Date()) {
+      // Clear expired tokens
+      const response = NextResponse.redirect(
+        new URL(AuthalloggiatiLogin(), request.url),
+      );
+      response.cookies.delete("alloggiati_token");
+      response.cookies.delete("alloggiati_expires");
+      response.cookies.delete("alloggiati_user");
+      return response;
+    }
+  }
 
-  // Allow access to all other routes
   return NextResponse.next();
 }
 
