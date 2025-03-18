@@ -1,8 +1,10 @@
 import soap from "soap";
 import type {
   SoapClient,
-  AuthenticationTestResponse,
+  GenerateTokenParams,
+  GenerateTokenResult,
   ServiceResult,
+  AuthenticationTestResponse,
   TabellaParams,
   TabellaResponse,
 } from "./types";
@@ -12,50 +14,37 @@ const WSDL_URL =
 
 let soapClient: SoapClient | null = null;
 
-export async function getSoapClient(): Promise<SoapClient | null> {
+export async function getSoapClient(): Promise<SoapClient> {
   if (!soapClient) {
-    soapClient = await new Promise<SoapClient>((resolve, reject) => {
-      soap.createClient(
+    try {
+      soapClient = (await soap.createClientAsync(
         WSDL_URL,
-        {},
-        (err: Error | null, client: soap.Client | undefined) => {
-          if (err) {
-            reject(new Error(err.message || "Failed to create SOAP client"));
-            return;
-          }
-          if (!client) {
-            reject(new Error("SOAP client is undefined"));
-            return;
-          }
-          resolve(client as unknown as SoapClient);
-        },
-      );
-    });
+      )) as unknown as SoapClient;
+    } catch (error: any) {
+      throw new Error(`Failed to create SOAP client: ${error.message}`);
+    }
   }
   return soapClient;
 }
 
-export async function generateTokenService(params: {
-  Utente: string;
-  Password: string;
-  WsKey: string;
-}) {
+export async function generateTokenService(params: GenerateTokenParams) {
   const client = await getSoapClient();
-  if (!client) {
-    throw new Error("Failed to create SOAP client");
+
+  try {
+    const [result] = await client.GenerateTokenAsync(params);
+
+    if (result.result?.ErroreDettaglio) {
+      throw new Error(result.result.ErroreDettaglio);
+    }
+
+    return {
+      token: result.GenerateTokenResult.token,
+      issued: result.GenerateTokenResult.issued,
+      expires: result.GenerateTokenResult.expires,
+    };
+  } catch (error: any) {
+    throw new Error(`Generate token failed: ${error.message}`);
   }
-
-  const result = await client.GenerateToken(params);
-
-  if (result.result?.ErroreDettaglio) {
-    throw new Error(result.result.ErroreDettaglio);
-  }
-
-  return {
-    token: result.GenerateTokenResult.token,
-    issued: result.GenerateTokenResult.issued,
-    expires: result.GenerateTokenResult.expires,
-  };
 }
 
 export async function addApartmentService(params: {

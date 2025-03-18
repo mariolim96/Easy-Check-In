@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,21 +53,23 @@ export default function AlloggiatiLogin() {
       }
 
       // Store the token in cookies
-      const oneWeek = 7 * 24 * 60 * 60; // 7 days in seconds
-      Cookies.set('alloggiati_token', response.token, { 
+      Cookies.set("alloggiati_token", response.token, {
         expires: 7, // 7 days
         secure: true,
-        sameSite: 'strict'
+        sameSite: "strict",
+        path: "/",
       });
-      Cookies.set('alloggiati_expires', response.expires, { 
+      Cookies.set("alloggiati_expires", response.expires, {
         expires: 7,
         secure: true,
-        sameSite: 'strict'
+        sameSite: "strict",
+        path: "/",
       });
-      Cookies.set('alloggiati_user', values.Utente, { 
+      Cookies.set("alloggiati_user", values.Utente, {
         expires: 7,
         secure: true,
-        sameSite: 'strict'
+        sameSite: "strict",
+        path: "/",
       });
 
       toast.success("Login successful", {

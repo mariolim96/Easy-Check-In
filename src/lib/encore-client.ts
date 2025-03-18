@@ -145,25 +145,6 @@ export namespace alloggiati {
     success: boolean;
   }
 
-  export interface TabellaParams {
-    Utente: string;
-    token: string;
-    tipo: TabellaType;
-    CSV: string;
-  }
-
-  export interface TabellaResponse {
-    csv: string;
-    error?: string;
-  }
-
-  export type TabellaType =
-    | "Luoghi"
-    | "Tipi_Documento"
-    | "Tipi_Alloggiato"
-    | "TipoErrore"
-    | "ListaAppartamenti";
-
   export class ServiceClient {
     private baseClient: BaseClient;
 
@@ -229,16 +210,6 @@ export namespace alloggiati {
         JSON.stringify(params),
       );
       return (await resp.json()) as SendFileUnicoResponse;
-    }
-
-    public async tabella(params: TabellaParams): Promise<TabellaResponse> {
-      // Now make the actual call to the API
-      const resp = await this.baseClient.callTypedAPI(
-        "POST",
-        `/alloggiati.tabella`,
-        JSON.stringify(params),
-      );
-      return (await resp.json()) as TabellaResponse;
     }
 
     public async testAuthentication(

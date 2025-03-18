@@ -40,11 +40,6 @@ export default async function authMiddleware(request: NextRequest) {
   const alloggiatiUser = request.cookies.get("alloggiati_user")?.value;
   console.log(" alloggiatiUser:", alloggiatiUser);
 
-  // If not logged into Alloggiati, redirect to login
-  //   debugger;
-  //   if (!alloggiatiToken || !alloggiatiUser) {
-  //     return NextResponse.redirect(new URL(AuthalloggiatiLogin(), request.url));
-  //   }
   // Allow auth routes
   if (authRoutes.some((route) => pathname === route)) {
     return NextResponse.next();
@@ -61,7 +56,6 @@ export default async function authMiddleware(request: NextRequest) {
       },
     },
   );
-  console.log("session:", session);
   // If no session exists, redirect to sign-in
   if (!session) {
     return NextResponse.redirect(new URL(AuthSignIn(), request.url));

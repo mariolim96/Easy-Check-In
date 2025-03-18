@@ -18,7 +18,6 @@ import { Button } from "../ui/button";
 export default function Header() {
   const router = useRouter();
   const { data: session } = useSession();
-  console.log("header session:", session);
   return (
     <div className="sticky top-0 z-50 bg-white/75 shadow backdrop-blur">
       <div className="container mx-auto flex h-12 items-center justify-between">
@@ -46,7 +45,19 @@ export default function Header() {
                     onClick={() =>
                       signOut({
                         fetchOptions: {
-                          onSuccess: () => router.push(Home()),
+                          onSuccess: () => {
+                            document.cookie.split(";").forEach((c) => {
+                              document.cookie = c
+                                .replace(/^ +/, "")
+                                .replace(
+                                  /=.*/,
+                                  "=;expires=" +
+                                    new Date().toUTCString() +
+                                    ";path=/",
+                                );
+                            });
+                            router.push(Home());
+                          },
                         },
                       })
                     }

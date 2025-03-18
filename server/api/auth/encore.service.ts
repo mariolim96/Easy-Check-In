@@ -4,8 +4,9 @@ import { authHandler } from "encore.dev/auth";
 import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins";
 import pg from "pg";
-import { db } from "@/server/db/db";
 import { sendMail } from "../mail/mail.service";
+import log from "encore.dev/log";
+import { db } from "../../db/db";
 
 export default new Service("User");
 
@@ -15,7 +16,6 @@ interface AuthParams {
 
 interface AuthData {
   userID: string;
-  alloggiatiToken?: string;
 }
 
 interface SessionUser {
@@ -40,16 +40,13 @@ export const handler = authHandler<AuthParams, AuthData>(async (params) => {
       },
       {} as Record<string, string>,
     );
-
+    log.info("cookieMap:", { cookieMap });
     const sessionToken = cookieMap["better-auth.session_token"];
-    const alloggiatiToken = cookieMap["alloggiati_token"];
-
     if (!sessionToken) throw APIError.unauthenticated("No session token found");
-    if (!alloggiatiToken)
-      throw APIError.unauthenticated("No alloggiati token found");
-
+    const alloggiatiToken = cookieMap["alloggiati_token"];
     const headers = new Headers();
     headers.append("Cookie", `better-auth.session_token=${sessionToken}`);
+    headers.append("Cookie", `alloggiati_token=${alloggiatiToken}`);
 
     const session: Session | null = await auth.api.getSession({ headers });
 
@@ -57,10 +54,7 @@ export const handler = authHandler<AuthParams, AuthData>(async (params) => {
       throw APIError.unauthenticated("Invalid session");
     }
 
-    return {
-      userID: session.user.id,
-      alloggiatiToken,
-    };
+    return { userID: session.user.id, alloggiatiToken: alloggiatiToken };
   } catch {
     throw APIError.unauthenticated("Invalid session");
   }

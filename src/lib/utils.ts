@@ -6,16 +6,15 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const Encore = new Client(
-  Local,
-  // {
-  //   requestInit: {
-  //     credentials: "include", // This enables sending cookies
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   },
-  // }
-);
+const Encore = new Client(Local, {
+  requestInit: {
+    credentials: "include", // This enables sending cookies
+    headers: {
+      "Content-Type": "application/json",
+      cookie: typeof window !== "undefined" ? document.cookie : "",
+    },
+  },
+});
 
 export { Encore, cn };
+

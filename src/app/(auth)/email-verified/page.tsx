@@ -1,7 +1,9 @@
+'use client';
+
 import { buttonVariants } from "@/components/ui/button";
 import { Home } from "@/routes";
 
-export default async function EmailVerifiedPage() {
+export default function EmailVerifiedPage() {
   return (
     <div className="flex grow flex-col items-center justify-center p-4">
       <h1 className="mb-4 text-2xl font-bold text-green-500">
