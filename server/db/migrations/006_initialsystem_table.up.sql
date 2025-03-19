@@ -1,3 +1,15 @@
+-- Create properties table first
+CREATE TABLE IF NOT EXISTS "properties" (
+    "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "user_id" VARCHAR(255) NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
+    "name" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
+    "has_sciaa_license" BOOLEAN DEFAULT FALSE,
+    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Then create alloggiati_configs table
 CREATE TABLE IF NOT EXISTS "alloggiati_configs" (
     "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "property_id" UUID NOT NULL REFERENCES "properties"("id") ON DELETE CASCADE,
@@ -13,20 +25,6 @@ CREATE TABLE IF NOT EXISTS "alloggiati_configs" (
     UNIQUE("property_id")
 );
 
--- Drop the properties table with CASCADE to handle dependencies
-DROP TABLE IF EXISTS "properties" CASCADE;
-
--- Recreate the properties table with all required columns
-CREATE TABLE IF NOT EXISTS "properties" (
-    "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    "user_id" VARCHAR(255) NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
-    "name" TEXT NOT NULL,
-    "address" TEXT NOT NULL,
-    "has_sciaa_license" BOOLEAN DEFAULT FALSE,
-    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE IF NOT EXISTS "apartments" (
     "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "property_id" UUID NOT NULL REFERENCES "properties"("id") ON DELETE CASCADE,
@@ -35,6 +33,9 @@ CREATE TABLE IF NOT EXISTS "apartments" (
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+-- Create index for better query performance
 
 CREATE TABLE IF NOT EXISTS "bookings" (
     "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -86,14 +87,14 @@ CREATE TABLE IF NOT EXISTS "tourist_tax_reports" (
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create indexes for better query performance
+-- Create indexes
 CREATE INDEX idx_properties_user_id ON "properties"("user_id");
+CREATE INDEX idx_alloggiati_configs_property_id ON "alloggiati_configs"("property_id");
 CREATE INDEX idx_apartments_property_id ON "apartments"("property_id");
 CREATE INDEX idx_bookings_apartment_id ON "bookings"("apartment_id");
 CREATE INDEX idx_guests_booking_id ON "guests"("booking_id");
 CREATE INDEX idx_alloggiati_submissions_property_id ON "alloggiati_submissions"("property_id");
 CREATE INDEX idx_alloggiati_submissions_booking_id ON "alloggiati_submissions"("booking_id");
 CREATE INDEX idx_tourist_tax_reports_property_id ON "tourist_tax_reports"("property_id");
-CREATE INDEX idx_alloggiati_configs_property_id ON "alloggiati_configs"("property_id");
 
 
