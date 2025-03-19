@@ -13,6 +13,8 @@ import {
   type SendFileUnicoResponse,
   type SendApartmentParams,
   type SendApartmentResponse,
+  type TabellaParams,
+  type TabellaResponse,
 } from "./types";
 import {
   generateTokenService,
@@ -21,6 +23,7 @@ import {
   testAuthenticationService,
   sendFileUnicoService,
   sendApartmentService,
+  tabellaService,
 } from "./services";
 
 export const generateToken = api(
@@ -94,5 +97,17 @@ export const sendApartment = api(
     }
 
     return await sendApartmentService(params);
+  },
+);
+
+export const getTabella = api(
+  { method: "POST", expose: true },
+  async (params: TabellaParams): Promise<TabellaResponse> => {
+    const auth = getAuthData();
+    if (!auth?.userID) {
+      throw new Error("User not authenticated");
+    }
+
+    return await tabellaService(params);
   },
 );

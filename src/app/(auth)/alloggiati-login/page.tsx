@@ -43,7 +43,7 @@ export default function AlloggiatiLogin() {
 
   const onSubmit = async (values: AlloggiatiLoginForm) => {
     try {
-      const response = await Encore.alloggiati.generateToken(values);
+      const response = await Encore.Alloggiati.generateToken(values);
 
       if (response.error) {
         toast.error("Login failed", {

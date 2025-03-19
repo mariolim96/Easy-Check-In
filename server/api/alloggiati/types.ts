@@ -5,9 +5,15 @@ export interface SoapClient extends Client {
     GenerateTokenResult: GenerateTokenResult;
     result: ServiceResult;
   }>;
-  Authentication_Test(params: AuthenticationTestParams): Promise<{
-    Authentication_TestResult: ServiceResult;
-  }>;
+  Authentication_TestAsync(params: AuthenticationTestParams): Promise<
+    [
+      {
+        Authentication_TestResult: {
+          ErroreDettaglio: string;
+        };
+      },
+    ]
+  >;
   GestioneAppartamenti_AggiungiAppartamento(
     params: AddApartmentParams,
   ): Promise<{
@@ -82,6 +88,7 @@ export interface AuthenticationTestParams {
 }
 export interface AuthenticationTestResponse {
   ErroreDettaglio: string;
+  success?: boolean;
 }
 export interface EsitoOperazioneServizio {
   ErroreDettaglio: string;
@@ -122,15 +129,26 @@ export interface TabellaParams {
   Utente: string;
   token: string;
   tipo: TabellaType;
-  CSV: string;
 }
 
 export interface TabellaResult {
+  esito: boolean;
+  ErroreCod: string;
+  ErroreDes: string;
   ErroreDettaglio: string;
   CSV: string;
 }
 
+export interface Apartment {
+  IDAPP: string;
+  Descrizione: string;
+  COMUNE: string;
+  PROV: string;
+  Indirizzo: string;
+  Proprietario: string;
+}
+
 export interface TabellaResponse {
-  csv: string;
+  data: Apartment[];
   error?: string;
 }

@@ -1,196 +1,319 @@
-import { api } from "encore.dev/api";
-import { db } from "../../db/db";
+import { api, APIError } from "encore.dev/api";
 import { getAuthData } from "~encore/auth";
+import { db } from "../../db/db";
 
-// Property interface
-interface Property {
-  id: string;
-  userId: string;
+export interface CreatePropertyParams {
   name: string;
-  nomeAlloggiatiWeb: string;
-  rooms: number;
-  beds: number;
-  touristTax: number;
-  isActive: boolean;
-  createdAt: Date;
+  address: string;
+  hasSciaaLicense: boolean;
+  alloggiatiConfig: {
+    username: string;
+    password: string;
+    wsKey: string;
+  };
+  apartments: {
+    name: string;
+    maxGuests: number;
+  }[];
 }
 
-// Create Property
-interface CreatePropertyParams {
-  name: string;
-  nomeAlloggiatiWeb: string;
-  rooms: number;
-  beds: number;
-  touristTax: number;
-}
-
-interface CreatePropertyResponse {
+export interface CreatePropertyResponse {
   id: string;
-  message: string;
+  apartments: {
+    id: string;
+    name: string;
+  }[];
 }
 
 export const createProperty = api(
-  { method: "POST", expose: true },
-  async (params: CreatePropertyParams) => {
+  { method: "POST", expose: true, auth: true },
+  async (params: CreatePropertyParams): Promise<CreatePropertyResponse> => {
     const auth = getAuthData();
     if (!auth?.userID) {
-      throw new Error("User not authenticated");
+      throw APIError.unauthenticated("User not authenticated");
     }
 
-    const result = await db.exec`
-      INSERT INTO properties (
-        user_id, 
-        name, 
-        nome_alloggiati_web, 
-        rooms, 
-        beds, 
-        tourist_tax, 
-        is_active
-      )
-      VALUES (
-        ${auth.userID}, 
-        ${params.name}, 
-        ${params.nomeAlloggiatiWeb}, 
-        ${params.rooms}, 
-        ${params.beds}, 
-        ${params.touristTax}, 
-        true
-      )
-      RETURNING id
-    `;
+    try {
+      // Start transaction
+      await db.query`BEGIN`;
 
-    return {
-      id: result,
-      message: "Property created successfully",
-    };
+      // Log the incoming parameters for debugging
+      console.log(
+        "Creating property with params:",
+        JSON.stringify(params, null, 2),
+      );
+
+      // Insert property
+      const propertyResult = await db.query<{ id: string }>`
+        INSERT INTO properties (
+          user_id,
+          name,
+          address,
+          has_sciaa_license,
+          created_at,
+          updated_at
+        ) VALUES (${auth.userID}, ${params.name}, ${params.address}, ${params.hasSciaaLicense}, NOW(), NOW())
+        RETURNING id
+      `;
+
+      let propertyId = "";
+      for await (const row of propertyResult) {
+        propertyId = row.id;
+        break;
+      }
+
+      if (!propertyId) {
+        throw new Error("Failed to get property ID after insertion");
+      }
+
+      console.log("Property created with ID:", propertyId);
+
+      try {
+        // Insert alloggiati config
+        await db.query`
+          INSERT INTO alloggiati_configs (
+            property_id,
+            username,
+            password,
+            ws_key,
+            created_at,
+            updated_at
+          ) VALUES (
+            ${propertyId},
+            ${params.alloggiatiConfig.username},
+            ${params.alloggiatiConfig.password},
+            ${params.alloggiatiConfig.wsKey},
+            NOW(),
+            NOW()
+          )
+        `;
+
+        console.log("Alloggiati config created for property:", propertyId);
+      } catch (error) {
+        console.error("Failed to insert alloggiati config:", error);
+        throw error;
+      }
+
+      try {
+        // Insert apartments
+        const apartmentPromises = params.apartments.map(
+          (apt) =>
+            db.query<{ id: string; name: string }>`
+            INSERT INTO apartments (
+              property_id,
+              name,
+              max_guests,
+              created_at,
+              updated_at
+            ) VALUES (${propertyId}, ${apt.name}, ${apt.maxGuests}, NOW(), NOW())
+            RETURNING id, name
+          `,
+        );
+
+        const apartmentResults = await Promise.all(apartmentPromises);
+        const apartments = [];
+        for (const apartmentResult of apartmentResults) {
+          for await (const row of apartmentResult) {
+            apartments.push({
+              id: row.id,
+              name: row.name,
+            });
+            break;
+          }
+        }
+
+        console.log("Apartments created:", apartments);
+
+        // Commit transaction
+        await db.query`COMMIT`;
+
+        return {
+          id: propertyId,
+          apartments,
+        };
+      } catch (error) {
+        console.error("Failed to insert apartments:", error);
+        throw error;
+      }
+    } catch (error) {
+      // Rollback transaction on error
+      await db.query`ROLLBACK`;
+
+      console.error("Create property error details:", {
+        error,
+        stack: error instanceof Error ? error.stack : undefined,
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+
+      throw APIError.internal("Failed to create property", {
+        cause: error,
+        name: error instanceof Error ? error.name : "UnknownError",
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
   },
 );
 
-// List Properties
-interface ListPropertiesResponse {
-  properties: Property[];
+export interface Property {
+  id: string;
+  name: string;
+  address: string;
+  has_sciaa_license: boolean;
+  apartments: {
+    id: string;
+    name: string;
+    maxGuests: number;
+  }[];
 }
 
-export const listProperties = api(
-  { method: "GET", expose: true },
-  async (): Promise<ListPropertiesResponse> => {
-    const properties: Property[] = [];
+export const getProperties = api(
+  { method: "GET", expose: true, auth: true },
+  async (): Promise<{ properties: Property[] }> => {
     const auth = getAuthData();
-
     if (!auth?.userID) {
-      throw new Error("User not authenticated");
+      throw APIError.unauthenticated("User not authenticated");
     }
 
-    for await (const row of db.query`
-      SELECT 
-        id,
-        user_id as "userId",
-        name,
-        nome_alloggiati_web as "nomeAlloggiatiWeb",
-        rooms,
-        beds,
-        tourist_tax as "touristTax",
-        is_active as "isActive",
-        created_at as "createdAt"
-      FROM properties
-      WHERE user_id = ${auth.userID}
-      ORDER BY created_at DESC
-    `) {
-      properties.push(row as Property);
-    }
+    try {
+      const result = await db.query<Property>`
+        SELECT 
+          p.*,
+          (
+            SELECT json_agg(
+              json_build_object(
+                'id', a.id,
+                'name', a.name,
+                'maxGuests', a.max_guests
+              )
+            )
+            FROM apartments a
+            WHERE a.property_id = p.id
+          ) as apartments
+        FROM properties p
+        WHERE p.user_id = ${auth.userID}
+        ORDER BY p.created_at DESC
+      `;
 
-    return { properties };
+      const properties: Property[] = [];
+      for await (const row of result) {
+        properties.push({
+          id: row.id,
+          name: row.name,
+          address: row.address,
+          has_sciaa_license: row.has_sciaa_license,
+          apartments: row.apartments || [], // Use empty array if no apartments found
+        });
+      }
+
+      return { properties };
+    } catch (error) {
+      console.error("Database error:", error);
+      throw APIError.internal("Failed to fetch properties", {
+        cause: error,
+        name: "DatabaseError",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
   },
 );
 
-// Get Property
-// interface GetPropertyParams {
-//     propertyId: string;
-// }
+interface GetPropertyParams {
+  propertyId: string;
+}
 
-// export const getProperty = api(
-//     { method: "GET", expose: true },
-//     async (params: GetPropertyParams): Promise<Property> => {
-//         const result = await db.query`
-//             SELECT * FROM properties WHERE id = ${params.propertyId}
-//         `;
+export const getProperty = api(
+  { method: "GET", expose: true, auth: true },
+  async (params: GetPropertyParams) => {
+    const auth = getAuthData();
+    if (!auth?.userID) {
+      throw APIError.unauthenticated("User not authenticated");
+    }
 
-//         if (!result[0]) {
-//             throw new Error("Property not found");
-//         }
+    const result = await db.query`
+      SELECT
+        p.*,
+        ac.username as alloggiati_username,
+        ac.ws_key as alloggiati_ws_key,
+        json_agg(
+          json_build_object(
+            'id', a.id,
+            'name', a.name,
+            'maxGuests', a.max_guests
+          )
+        ) as apartments
+      FROM properties p
+      LEFT JOIN alloggiati_configs ac ON ac.property_id = p.id
+      LEFT JOIN apartments a ON a.property_id = p.id
+      WHERE p.id = ${params.propertyId} AND p.user_id = ${auth.userID}
+      GROUP BY p.id, ac.username, ac.ws_key
+    `;
 
-//         return result[0];
+    let property = null;
+    for await (const row of result) {
+      property = row;
+      break; // We only need the first row
+    }
+
+    if (!property) {
+      throw APIError.notFound("Property not found");
+    }
+
+    return property;
+  },
+);
+
+// export const listProperties = api(
+//   { method: "GET", expose: true, auth: true },
+//   async () => {
+//     const auth = getAuthData();
+//     if (!auth?.userID) {
+//       throw APIError.unauthenticated("User not authenticated");
 //     }
-// );
 
-// // Update Property
-// interface UpdatePropertyParams {
-//     propertyId: string;
-//     title?: string;
-//     description?: string;
-//     address?: string;
-// }
+//     const result = await db.query`
+//       SELECT
+//         p.id,
+//         p.name,
+//         p.address,
+//         p.has_sciaa_license as hasSciaaLicense,
+//         ac.username as alloggiati_username,
+//         ac.password as alloggiati_password,
+//         ac.ws_key as alloggiati_ws_key,
+//         (
+//           SELECT json_agg(
+//             json_build_object(
+//               'id', a.id,
+//               'name', a.name,
+//               'maxGuests', a.max_guests
+//             )
+//           )
+//           FROM apartments a
+//           WHERE a.property_id = p.id
+//         ) as apartments
+//       FROM properties p
+//       LEFT JOIN alloggiati_configs ac ON ac.property_id = p.id
+//       WHERE p.user_id = ${auth.userID}
+//       ORDER BY p.created_at DESC
+//     `;
 
-// export const updateProperty = api(
-//     { method: "PUT", expose: true },
-//     async (params: UpdatePropertyParams): Promise<Property> => {
-//         let updates = [];
-//         if (params.title) updates.push(sql`title = ${params.title}`);
-//         if (params.description) updates.push(sql`description = ${params.description}`);
-//         if (params.address) updates.push(sql`address = ${params.address}`);
-
-//         const updateQuery = updates.join(", ");
-
-//         const result = await db.query`
-//             UPDATE properties
-//             SET ${sql.raw(updateQuery)}
-//             WHERE id = ${params.propertyId}
-//             RETURNING *
-//         `;
-
-//         if (!result[0]) {
-//             throw new Error("Property not found");
-//         }
-
-//         return result[0];
+//     const properties:  = [];
+//     for await (const row of result) {
+//       properties.push({
+//         id: row.id,
+//         name: row.name,
+//         address: row.address,
+//         hasSciaaLicense: row.hassciaalicense,
+//         alloggiatiConfig: {
+//           username: row.alloggiati_username,
+//           password: row.alloggiati_password,
+//           wsKey: row.alloggiati_ws_key,
+//         },
+//         apartments: row.apartments || [],
+//       });
 //     }
-// );
 
-// // Delete Property
-// interface DeletePropertyParams {
-//     propertyId: string;
-// }
-
-// export const deleteProperty = api(
-//     { method: "DELETE", expose: true },
-//     async (params: DeletePropertyParams): Promise<void> => {
-//         await db.query`
-//             DELETE FROM properties WHERE id = ${params.propertyId}
-//         `;
-//     }
-// );
-
-// // New interface for disable/enable property
-// interface TogglePropertyStatusParams {
-//     propertyId: string;
-//     disabled: boolean;
-// }
-
-// export const togglePropertyStatus = api(
-//     { method: "POST", expose: true },
-//     async (params: TogglePropertyStatusParams): Promise<Property> => {
-//         const result = await db.query`
-//             UPDATE properties
-//             SET disabled = ${params.disabled}
-//             WHERE id = ${params.propertyId}
-//             RETURNING *
-//         `;
-
-//         const property = await result.next();
-//         if (!property) {
-//             throw new Error("Property not found");
-//         }
-
-//     return property as Property;
-//   }
+//     return {
+//       properties,
+//     };
+//   },
 // );

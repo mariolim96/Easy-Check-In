@@ -30,9 +30,9 @@ export function PreviewEnv(pr: number | string): BaseURL {
  * Client is an API client for the eci-6kci Encore application.
  */
 export default class Client {
-  public readonly alloggiati: alloggiati.ServiceClient;
+  public readonly Alloggiati: Alloggiati.ServiceClient;
   public readonly User: User.ServiceClient;
-  public readonly properties: properties.ServiceClient;
+  public readonly Property: Property.ServiceClient;
 
   /**
    * Creates a Client for calling the public and authenticated APIs of your Encore application.
@@ -42,9 +42,9 @@ export default class Client {
    */
   constructor(target: BaseURL, options?: ClientOptions) {
     const base = new BaseClient(target, options ?? {});
-    this.alloggiati = new alloggiati.ServiceClient(base);
+    this.Alloggiati = new Alloggiati.ServiceClient(base);
     this.User = new User.ServiceClient(base);
-    this.properties = new properties.ServiceClient(base);
+    this.Property = new Property.ServiceClient(base);
   }
 }
 
@@ -72,6 +72,183 @@ export interface ClientOptions {
   auth?: auth.AuthParams | AuthDataGenerator;
 }
 
+export namespace Alloggiati {
+  export class ServiceClient {
+    private baseClient: BaseClient;
+
+    constructor(baseClient: BaseClient) {
+      this.baseClient = baseClient;
+    }
+
+    public async addApartment(
+      params: alloggiati.AddApartmentParams,
+    ): Promise<alloggiati.AddApartmentResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/Alloggiati.addApartment`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as alloggiati.AddApartmentResponse;
+    }
+
+    public async disableApartment(
+      params: alloggiati.DisableApartmentParams,
+    ): Promise<alloggiati.DisableApartmentResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/Alloggiati.disableApartment`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as alloggiati.DisableApartmentResponse;
+    }
+
+    public async generateToken(
+      params: alloggiati.GenerateTokenParams,
+    ): Promise<alloggiati.GenerateTokenResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/Alloggiati.generateToken`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as alloggiati.GenerateTokenResponse;
+    }
+
+    public async getTabella(
+      params: alloggiati.TabellaParams,
+    ): Promise<alloggiati.TabellaResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/Alloggiati.getTabella`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as alloggiati.TabellaResponse;
+    }
+
+    public async sendApartment(
+      params: alloggiati.SendApartmentParams,
+    ): Promise<alloggiati.SendApartmentResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/Alloggiati.sendApartment`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as alloggiati.SendApartmentResponse;
+    }
+
+    public async sendFileUnico(
+      params: alloggiati.SendFileUnicoParams,
+    ): Promise<alloggiati.SendFileUnicoResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/Alloggiati.sendFileUnico`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as alloggiati.SendFileUnicoResponse;
+    }
+
+    public async testAuthentication(
+      params: alloggiati.AuthenticationTestParams,
+    ): Promise<alloggiati.AuthenticationTestResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/Alloggiati.testAuthentication`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as alloggiati.AuthenticationTestResponse;
+    }
+  }
+}
+
+export namespace User {
+  export class ServiceClient {
+    private baseClient: BaseClient;
+
+    constructor(baseClient: BaseClient) {
+      this.baseClient = baseClient;
+    }
+
+    public async authRouter(
+      method:
+        | "GET"
+        | "POST"
+        | "PATCH"
+        | "PUT"
+        | "DELETE"
+        | "HEAD"
+        | "OPTIONS"
+        | "TRACE",
+      _params: string[],
+      body?: BodyInit,
+      options?: CallParameters,
+    ): Promise<globalThis.Response> {
+      return this.baseClient.callAPI(
+        method,
+        `/api/auth/${_params.map(encodeURIComponent).join("/")}`,
+        body,
+        options,
+      );
+    }
+  }
+}
+
+export namespace Property {
+  export class ServiceClient {
+    private baseClient: BaseClient;
+
+    constructor(baseClient: BaseClient) {
+      this.baseClient = baseClient;
+    }
+
+    public async createProperty(
+      params: properties.CreatePropertyParams,
+    ): Promise<properties.CreatePropertyResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/Property.createProperty`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as properties.CreatePropertyResponse;
+    }
+
+    public async getProperties(): Promise<{
+      properties: properties.Property[];
+    }> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "GET",
+        `/Property.getProperties`,
+      );
+      return (await resp.json()) as {
+        properties: properties.Property[];
+      };
+    }
+
+    public async getProperty(
+      params: properties.GetPropertyParams,
+    ): Promise<void> {
+      // Convert our params into the objects we need for the request
+      const query = makeRecord<string, string | string[]>({
+        propertyId: params.propertyId,
+      });
+
+      await this.baseClient.callTypedAPI(
+        "GET",
+        `/Property.getProperty`,
+        undefined,
+        { query },
+      );
+    }
+  }
+}
+
 export namespace alloggiati {
   export interface AddApartmentParams {
     Utente: string;
@@ -87,6 +264,15 @@ export namespace alloggiati {
     error?: string;
   }
 
+  export interface Apartment {
+    IDAPP: string;
+    Descrizione: string;
+    COMUNE: string;
+    PROV: string;
+    Indirizzo: string;
+    Proprietario: string;
+  }
+
   export interface AuthenticationTestParams {
     Utente: string;
     token: string;
@@ -94,6 +280,7 @@ export namespace alloggiati {
 
   export interface AuthenticationTestResponse {
     ErroreDettaglio: string;
+    success?: boolean;
   }
 
   export interface DisableApartmentParams {
@@ -145,173 +332,69 @@ export namespace alloggiati {
     success: boolean;
   }
 
-  export class ServiceClient {
-    private baseClient: BaseClient;
-
-    constructor(baseClient: BaseClient) {
-      this.baseClient = baseClient;
-    }
-
-    public async addApartment(
-      params: AddApartmentParams,
-    ): Promise<AddApartmentResponse> {
-      // Now make the actual call to the API
-      const resp = await this.baseClient.callTypedAPI(
-        "POST",
-        `/alloggiati.addApartment`,
-        JSON.stringify(params),
-      );
-      return (await resp.json()) as AddApartmentResponse;
-    }
-
-    public async disableApartment(
-      params: DisableApartmentParams,
-    ): Promise<DisableApartmentResponse> {
-      // Now make the actual call to the API
-      const resp = await this.baseClient.callTypedAPI(
-        "POST",
-        `/alloggiati.disableApartment`,
-        JSON.stringify(params),
-      );
-      return (await resp.json()) as DisableApartmentResponse;
-    }
-
-    public async generateToken(
-      params: GenerateTokenParams,
-    ): Promise<GenerateTokenResponse> {
-      // Now make the actual call to the API
-      const resp = await this.baseClient.callTypedAPI(
-        "POST",
-        `/alloggiati.generateToken`,
-        JSON.stringify(params),
-      );
-      return (await resp.json()) as GenerateTokenResponse;
-    }
-
-    public async sendApartment(
-      params: SendApartmentParams,
-    ): Promise<SendApartmentResponse> {
-      // Now make the actual call to the API
-      const resp = await this.baseClient.callTypedAPI(
-        "POST",
-        `/alloggiati.sendApartment`,
-        JSON.stringify(params),
-      );
-      return (await resp.json()) as SendApartmentResponse;
-    }
-
-    public async sendFileUnico(
-      params: SendFileUnicoParams,
-    ): Promise<SendFileUnicoResponse> {
-      // Now make the actual call to the API
-      const resp = await this.baseClient.callTypedAPI(
-        "POST",
-        `/alloggiati.sendFileUnico`,
-        JSON.stringify(params),
-      );
-      return (await resp.json()) as SendFileUnicoResponse;
-    }
-
-    public async testAuthentication(
-      params: AuthenticationTestParams,
-    ): Promise<AuthenticationTestResponse> {
-      // Now make the actual call to the API
-      const resp = await this.baseClient.callTypedAPI(
-        "POST",
-        `/alloggiati.testAuthentication`,
-        JSON.stringify(params),
-      );
-      return (await resp.json()) as AuthenticationTestResponse;
-    }
+  export interface TabellaParams {
+    Utente: string;
+    token: string;
+    tipo: TabellaType;
   }
+
+  export interface TabellaResponse {
+    data: Apartment[];
+    error?: string;
+  }
+
+  export type TabellaType =
+    | "Luoghi"
+    | "Tipi_Documento"
+    | "Tipi_Alloggiato"
+    | "TipoErrore"
+    | "ListaAppartamenti";
 }
 
-export namespace User {
-  export class ServiceClient {
-    private baseClient: BaseClient;
-
-    constructor(baseClient: BaseClient) {
-      this.baseClient = baseClient;
-    }
-
-    public async authRouter(
-      method:
-        | "GET"
-        | "POST"
-        | "PATCH"
-        | "PUT"
-        | "DELETE"
-        | "HEAD"
-        | "OPTIONS"
-        | "TRACE",
-      _params: string[],
-      body?: BodyInit,
-      options?: CallParameters,
-    ): Promise<globalThis.Response> {
-      return this.baseClient.callAPI(
-        method,
-        `/api/auth/${_params.map(encodeURIComponent).join("/")}`,
-        body,
-        options,
-      );
-    }
+export namespace auth {
+  export interface AuthParams {
+    cookie: string;
   }
 }
 
 export namespace properties {
   export interface CreatePropertyParams {
     name: string;
-    nomeAlloggiatiWeb: string;
-    rooms: number;
-    beds: number;
-    touristTax: number;
+    address: string;
+    hasSciaaLicense: boolean;
+    alloggiatiConfig: {
+      username: string;
+      password: string;
+      wsKey: string;
+    };
+    apartments: {
+      name: string;
+      maxGuests: number;
+    }[];
   }
 
-  export interface ListPropertiesResponse {
-    properties: Property[];
+  export interface CreatePropertyResponse {
+    id: string;
+    apartments: {
+      id: string;
+      name: string;
+    }[];
+  }
+
+  export interface GetPropertyParams {
+    propertyId: string;
   }
 
   export interface Property {
     id: string;
-    userId: string;
     name: string;
-    nomeAlloggiatiWeb: string;
-    rooms: number;
-    beds: number;
-    touristTax: number;
-    isActive: boolean;
-    createdAt: string;
-  }
-
-  export class ServiceClient {
-    private baseClient: BaseClient;
-
-    constructor(baseClient: BaseClient) {
-      this.baseClient = baseClient;
-    }
-
-    public async createProperty(params: CreatePropertyParams): Promise<void> {
-      await this.baseClient.callTypedAPI(
-        "POST",
-        `/properties.createProperty`,
-        JSON.stringify(params),
-      );
-    }
-
-    public async listProperties(): Promise<ListPropertiesResponse> {
-      // Now make the actual call to the API
-      const resp = await this.baseClient.callTypedAPI(
-        "GET",
-        `/properties.listProperties`,
-      );
-      return (await resp.json()) as ListPropertiesResponse;
-    }
-  }
-}
-
-export namespace auth {
-  export interface AuthParams {
-    cookie: string;
+    address: string;
+    has_sciaa_license: boolean;
+    apartments: {
+      id: string;
+      name: string;
+      maxGuests: number;
+    }[];
   }
 }
 

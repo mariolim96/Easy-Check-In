@@ -1,95 +1,144 @@
 "use client";
 
-import { Properties, CreateProperty } from "@/routes";
-import { useSearchParams } from "@/routes/hooks";
+import { useQuery } from "@tanstack/react-query";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
-import { PropertyCard } from "@/components/property-card";
+import { CreateProperty } from "@/routes";
+import { Encore } from "@/lib/utils";
 
 export default function PropertiesPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // Mock data - replace with actual API call
-  const properties = [
-    {
-      id: "1",
-      name: "Luxury Apartment",
-      type: "apartment",
-      location: "Downtown",
-    },
-    { id: "2", name: "Family House", type: "house", location: "Suburbs" },
-    {
-      id: "3",
-      name: "Studio Flat",
-      type: "apartment",
-      location: "City Center",
-    },
-  ];
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["properties"],
+    queryFn: () => Encore.Property.getProperties(),
+  });
 
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Properties</h1>
-        <CreateProperty.ParamsLink>
-          <Button variant="default">Add New Property</Button>
-        </CreateProperty.ParamsLink>
+        <CreateProperty.Link>
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" />
+            Create New Property
+          </Button>
+        </CreateProperty.Link>
       </div>
 
-      {/* Search and Filter Section */}
-      <div className="mb-6 flex gap-4">
-        <Input
-          type="text"
-          placeholder="Search properties..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
-        />
-        <Button variant="outline">Filter</Button>
-      </div>
+      {isLoading && (
+        <div className="flex items-center justify-center p-8">
+          <div className="text-lg text-muted-foreground">
+            Loading properties...
+          </div>
+        </div>
+      )}
 
-      {/* Properties Grid */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {properties.map((property) => (
-          <Card key={property.id}>
-            <CardHeader>
-              <CardTitle>{property.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Type: {property.type}</p>
-              <p className="text-muted-foreground">
-                Location: {property.location}
-              </p>
-              <div className="mt-4">
-                <PropertyCard propertyId={property.id} />
-              </div>
+      {isError && (
+        <Card className="bg-destructive/10">
+          <CardContent className="flex flex-col items-center justify-center p-6">
+            <p className="mb-4 text-destructive">
+              {error instanceof Error
+                ? error.message
+                : "Failed to load properties"}
+            </p>
+            <Button variant="outline" onClick={() => refetch()}>
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {!isLoading &&
+        !isError &&
+        (!data?.properties || data.properties.length === 0) && (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center p-6">
+              <p className="mb-4 text-muted-foreground">No properties found</p>
+              <CreateProperty.Link>
+                <Button>Create Your First Property</Button>
+              </CreateProperty.Link>
             </CardContent>
           </Card>
-        ))}
-      </div>
+        )}
 
-      {/* Pagination */}
-      <div className="mt-8 flex justify-center gap-2">
-        <Properties.Link
-          search={{ page: "1" }}
-          className="rounded-md px-4 py-2 hover:bg-accent"
-        >
-          1
-        </Properties.Link>
-        <Properties.Link
-          search={{ page: "2" }}
-          className="rounded-md px-4 py-2 hover:bg-accent"
-        >
-          2
-        </Properties.Link>
-        <Properties.Link
-          search={{ page: "3" }}
-          className="rounded-md px-4 py-2 hover:bg-accent"
-        >
-          3
-        </Properties.Link>
-      </div>
+      {data?.properties && data.properties.length > 0 && (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {data.properties.map((property) => (
+            <PropertyCard
+              key={property.id}
+              property={{
+                ...property,
+                hasSciaaLicense: property.has_sciaa_license,
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
+  );
+}
+
+interface Property {
+  id: string;
+  name: string;
+  address: string;
+  hasSciaaLicense: boolean;
+  apartments: {
+    id: string;
+    name: string;
+    maxGuests: number;
+  }[];
+}
+
+function PropertyCard({ property }: { property: Property }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <span>{property.name}</span>
+          {property.hasSciaaLicense && (
+            <span className="rounded-full bg-green-100 px-2 py-1 text-xs text-green-800">
+              SCIA License
+            </span>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">Address</p>
+            <p className="text-sm">{property.address}</p>
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">
+              Apartments ({property.apartments.length})
+            </p>
+            <ul className="mt-2 space-y-1">
+              {property.apartments.map((apartment) => (
+                <li
+                  key={apartment.id}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <span>{apartment.name}</span>
+                  <span className="text-muted-foreground">
+                    Max Guests: {apartment.maxGuests}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="flex gap-2 pt-4">
+            <Button variant="outline" className="w-full">
+              View Details
+            </Button>
+            <Button variant="outline" className="w-full">
+              Edit
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

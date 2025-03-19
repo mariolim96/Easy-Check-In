@@ -17,4 +17,3 @@ const Encore = new Client(Local, {
 });
 
 export { Encore, cn };
-

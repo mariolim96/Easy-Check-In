@@ -5,7 +5,6 @@ import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins";
 import pg from "pg";
 import { sendMail } from "../mail/mail.service";
-import log from "encore.dev/log";
 import { db } from "../../db/db";
 
 export default new Service("User");
@@ -40,7 +39,6 @@ export const handler = authHandler<AuthParams, AuthData>(async (params) => {
       },
       {} as Record<string, string>,
     );
-    log.info("cookieMap:", { cookieMap });
     const sessionToken = cookieMap["better-auth.session_token"];
     if (!sessionToken) throw APIError.unauthenticated("No session token found");
     const alloggiatiToken = cookieMap["alloggiati_token"];
