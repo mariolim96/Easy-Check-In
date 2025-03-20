@@ -217,48 +217,70 @@ export const getProperties = api(
   },
 );
 
-interface GetPropertyParams {
+export interface GetPropertyParams {
   propertyId: string;
+}
+
+export interface GetPropertyResponse {
+  property: Property;
 }
 
 export const getProperty = api(
   { method: "GET", expose: true, auth: true },
-  async (params: GetPropertyParams) => {
+  async (params: GetPropertyParams): Promise<GetPropertyResponse> => {
     const auth = getAuthData();
     if (!auth?.userID) {
       throw APIError.unauthenticated("User not authenticated");
     }
 
-    const result = await db.query`
+    const result = await db.query<{
+      id: string;
+      name: string;
+      address: string;
+      has_sciaa_license: boolean;
+      apartments: Array<{
+        id: string;
+        name: string;
+        maxGuests: number;
+      }> | null;
+    }>`
       SELECT
-        p.*,
-        ac.username as alloggiati_username,
-        ac.ws_key as alloggiati_ws_key,
-        json_agg(
-          json_build_object(
-            'id', a.id,
-            'name', a.name,
-            'maxGuests', a.max_guests
+        p.id,
+        p.name,
+        p.address,
+        p.has_sciaa_license,
+        (
+          SELECT json_agg(
+            json_build_object(
+              'id', a.id,
+              'name', a.name,
+              'maxGuests', a.max_guests
+            )
           )
+          FROM apartments a
+          WHERE a.property_id = p.id
         ) as apartments
       FROM properties p
-      LEFT JOIN alloggiati_configs ac ON ac.property_id = p.id
-      LEFT JOIN apartments a ON a.property_id = p.id
-      WHERE p.id = ${params.propertyId} AND p.user_id = ${auth.userID}
-      GROUP BY p.id, ac.username, ac.ws_key
+      WHERE p.id = ${params.propertyId}
+        AND p.user_id = ${auth.userID}
     `;
 
     let property = null;
     for await (const row of result) {
       property = row;
-      break; // We only need the first row
+      break;
     }
 
     if (!property) {
       throw APIError.notFound("Property not found");
     }
 
-    return property;
+    return {
+      property: {
+        ...property,
+        apartments: property.apartments || [],
+      },
+    };
   },
 );
 

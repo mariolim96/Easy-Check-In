@@ -5,4 +5,5 @@ export const Route = {
   params: z.object({
     propertyId: z.string(),
   }),
+  search: z.object({}),
 };
