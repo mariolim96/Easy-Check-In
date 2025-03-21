@@ -24,7 +24,10 @@
     "format:write:watch": "pnpm onchange -j 12 -d 1500 -f change -f add  \"**/*\" --exclude-path .gitignore -- prettier -w \"**/*.{ts,tsx,js,jsx,mdx,cjs,mjs,json}\" --cache --log-level warn",
     "dev": "concurrently -c \"#604CC3, #8FD14F ,#FF6600,#FFA600\" \"pnpm dev:turbo\" \"pnpm dr:build:watch\" \"pnpm format:write:watch\"  --names \"Next.js,Routing,Prettier\"",
     "be:gen": "encore gen client eci-6kci --output=./src/lib/encore-client.ts --env=local",
-    "be:run": "encore run"
+    "be:run": "encore run",
+    "be:db-shell": "encore db shell UserDB",
+    "be:db-reset": "encore db reset UserDB",
+    "be:db-uri": "encore db conn-uri UserDB"
   },
   "dependencies": {
     "@better-fetch/fetch": "^1.1.15",
@@ -36,10 +39,11 @@
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-dropdown-menu": "^2.1.4",
     "@radix-ui/react-label": "^2.1.1",
+    "@radix-ui/react-popover": "^1.1.6",
     "@radix-ui/react-progress": "^1.1.2",
     "@radix-ui/react-select": "^2.1.6",
     "@radix-ui/react-separator": "^1.1.2",
-    "@radix-ui/react-slot": "^1.1.1",
+    "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-tabs": "^1.1.3",
     "@radix-ui/react-toast": "^1.2.4",
     "@t3-oss/env-nextjs": "^0.11.1",
@@ -48,9 +52,10 @@
     "better-auth": "^1.2.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "declarative-routing": "^0.1.20",
     "drizzle-orm": "^0.38.4",
-    "encore.dev": "^1.46.10",
+    "encore.dev": "^1.46.11",
     "framer-motion": "^12.4.10",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.473.0",
@@ -61,6 +66,7 @@
     "postgres": "^3.4.5",
     "query-string": "^9.1.1",
     "react": "^19.0.0",
+    "react-day-picker": "8.10.1",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
     "react-use-measure": "^2.1.7",
@@ -97,9 +103,15 @@
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.10",
     "tailwindcss": "^3.4.17",
-    "typedoc": "^0.27.6",
+    "typedoc": "^0.28.1",
     "typedoc-github-theme": "^0.2.1",
-    "typedoc-plugin-markdown": "^4.4.1",
+    "typedoc-plugin-markdown": "^4.5.2",
     "typescript": "^5.7.3"
+  },
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
   }
 }

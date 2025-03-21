@@ -20,5 +20,17 @@
   //   },
   //   "peacock.color": "#1b1dea"
   "github.copilot.chat.codeGeneration.useInstructionFiles": true,
-  "dbcode.connections": []
+  "dbcode.connections": [],
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 9500,
+      "driver": "PostgreSQL",
+      "name": "encore ",
+      "database": "UserDB",
+      "username": "eci-6kci",
+      "password": "local"
+    }
+  ]
 }

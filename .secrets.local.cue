@@ -9,4 +9,5 @@ GITHUB_CLIENT_ID: "secret"
 GITHUB_CLIENT_SECRET: "secret"
 EMAIL_VERIFICATION_CALLBACK_URL: "http://localhost:3000"
 NEXT_PUBLIC_BETTER_AUTH_URL: "http://localhost:4000"
-NODE_ENV=development
+NODE_ENV=development:sk-68336ed9887944fcb5d3340bdec3f55 
+e

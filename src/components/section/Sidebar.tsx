@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { Building2, Home } from "lucide-react";
+import { Building2, Home, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 // Import the typed routes
-import { Home as HomeRoute, Properties } from "@/routes";
+import { Home as HomeRoute, Properties, Bookings } from "@/routes";
 import type { RouteBuilder } from "@/routes/makeRoute";
 
 interface SidebarProps {
@@ -93,6 +93,11 @@ export default function Sidebar({ links }: SidebarProps) {
       label: "Properties",
       route: Properties,
       icon: <Building2 className="mr-2 !size-6" />,
+    },
+    {
+      label: "Bookings",
+      route: Bookings,
+      icon: <Calendar className="mr-2 !size-6" />,
     },
   ];
   const [open, setOpen] = useState(false);

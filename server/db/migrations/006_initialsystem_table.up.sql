@@ -9,14 +9,13 @@ CREATE TABLE IF NOT EXISTS "properties" (
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Then create alloggiati_configs table
+-- Then create alloggiaticonfigs table
 CREATE TABLE IF NOT EXISTS "alloggiati_configs" (
     "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "property_id" UUID NOT NULL REFERENCES "properties"("id") ON DELETE CASCADE,
     "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "ws_key" TEXT NOT NULL,
-    "comune_codice" TEXT NOT NULL,
     "token" TEXT,
     "token_issued" TIMESTAMP,
     "token_expires" TIMESTAMP,
@@ -46,6 +45,8 @@ CREATE TABLE IF NOT EXISTS "bookings" (
     "source" TEXT NOT NULL,
     "external_id" TEXT,
     "status" TEXT NOT NULL,
+    "notes" TEXT,
+    "amount" DECIMAL(10,2),
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -53,14 +54,28 @@ CREATE TABLE IF NOT EXISTS "bookings" (
 CREATE TABLE IF NOT EXISTS "guests" (
     "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "booking_id" UUID NOT NULL REFERENCES "bookings"("id") ON DELETE CASCADE,
-    "first_name" TEXT NOT NULL,
-    "last_name" TEXT NOT NULL,
-    "document_type" TEXT NOT NULL,
-    "document_number" TEXT NOT NULL,
+    "guest_type" TEXT,
+    CHECK (guest_type IN ('group_leader', 'family_head', 'single_guest', 'family_member', 'group_member')),
+    "first_name" TEXT,
+    "last_name" TEXT,
+    "date_of_birth" DATE,
+    "place_of_birth" TEXT,
+    "nationality" TEXT,
+    "document_issue_date" DATE,
+    "document_expiry_date" DATE,
+    "document_issue_place" TEXT,
+    "document_type" TEXT,
+    "document_number" TEXT,
     "document_scan" TEXT,
+    "is_main_guest" BOOLEAN DEFAULT FALSE,
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add a constraint to ensure only one main guest per booking
+CREATE UNIQUE INDEX idx_main_guest_per_booking 
+ON "guests" (booking_id) 
+WHERE is_main_guest = TRUE;
 
 CREATE TABLE IF NOT EXISTS "alloggiati_submissions" (
     "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -86,6 +101,59 @@ CREATE TABLE IF NOT EXISTS "tourist_tax_reports" (
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- Ensuring you can't add more guests than specified in the booking
+-- Preventing modification of the booking's guest count once guests are added
+-- Ensuring you can't delete guests without updating the booking's guest count
+-- Function to check guest count
+-- CREATE OR REPLACE FUNCTION check_booking_guest_count()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     -- For INSERT/DELETE operations
+--     IF (TG_OP = 'INSERT' OR TG_OP = 'DELETE') THEN
+--         IF (
+--             (SELECT COUNT(*) FROM guests WHERE booking_id = NEW.booking_id) != 
+--             (SELECT guest_count FROM bookings WHERE id = NEW.booking_id)
+--         ) THEN
+--             RAISE EXCEPTION 'Number of guests does not match booking guest_count';
+--         END IF;
+--     END IF;
+    
+--     -- For UPDATE operations
+--     IF (TG_OP = 'UPDATE') THEN
+--         IF (
+--             (SELECT COUNT(*) FROM guests WHERE booking_id = NEW.booking_id) != 
+--             (SELECT guest_count FROM bookings WHERE id = NEW.booking_id)
+--         ) THEN
+--             RAISE EXCEPTION 'Number of guests does not match booking guest_count';
+--         END IF;
+--     END IF;
+    
+--     RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+-- -- Create trigger on guests table
+-- CREATE TRIGGER enforce_guest_count
+-- AFTER INSERT OR UPDATE OR DELETE ON guests
+-- FOR EACH ROW
+-- EXECUTE FUNCTION check_booking_guest_count();
+
+-- -- Create trigger to prevent booking guest_count updates
+-- CREATE OR REPLACE FUNCTION prevent_guest_count_mismatch()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     IF NEW.guest_count != OLD.guest_count AND 
+--        (SELECT COUNT(*) FROM guests WHERE booking_id = NEW.id) > 0 THEN
+--         RAISE EXCEPTION 'Cannot modify guest_count when guests are already associated';
+--     END IF;
+--     RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+-- CREATE TRIGGER prevent_booking_guest_count_update
+-- BEFORE UPDATE ON bookings
+-- FOR EACH ROW
+-- EXECUTE FUNCTION prevent_guest_count_mismatch();
 
 -- Create indexes
 CREATE INDEX idx_properties_user_id ON "properties"("user_id");
