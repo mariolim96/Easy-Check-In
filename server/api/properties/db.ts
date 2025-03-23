@@ -1,5 +1,10 @@
 import { db } from "../../db/db";
-import type { AlloggiatiConfig, ApartmentInput, Property } from "./types";
+import type {
+  AlloggiatiConfig,
+  ApartmentInput,
+  AvailableProperty,
+  Property,
+} from "./types";
 
 export const propertyQueries = {
   async insertProperty(
@@ -124,54 +129,65 @@ export const propertyQueries = {
     userId: string,
     dateFrom?: string,
     dateTo?: string,
-    guestCount?: number
+    guestCount?: number,
   ) {
-    let query = db.query<AvailableProperty>`
+    // ${
+    //   dateFrom && dateTo
+    //     ? `AND (${dateFrom}::date <= b.check_out AND ${dateTo}::date >= b.check_in)`
+    //     : ``
+    // }
+    const hasDates = !(dateFrom && dateTo);
+    const query = db.query<AvailableProperty>`
       WITH available_apartments AS (
         SELECT 
           a.id as apartment_id,
           a.name as apartment_name,
           a.max_guests,
-          a.property_id,
+          p.id as property_id,
           p.name as property_name
         FROM apartments a
         JOIN properties p ON p.id = a.property_id
+        LEFT JOIN bookings b ON b.apartment_id = a.id
+        //   AND COALESCE(b.check_out < ${dateFrom ?? ''}::date OR b.check_in > ${dateTo ?? }::date, FALSE)
         WHERE p.user_id = ${userId}
-        AND (${guestCount}::int IS NULL OR a.max_guests >= ${guestCount})
-        AND NOT EXISTS (
-          SELECT 1 FROM bookings b
-          WHERE b.apartment_id = a.id
-          AND b.status NOT IN ('cancelled')
-          AND (
-            ${dateFrom}::timestamp IS NULL 
-            OR ${dateTo}::timestamp IS NULL
-            OR (
-              b.check_out > ${dateFrom}::timestamp 
-              AND b.check_in < ${dateTo}::timestamp
-            )
-          )
-        )
+        AND (${guestCount ?? 0} = 0 OR a.max_guests >= ${guestCount ?? 0})
+        AND b.id IS NULL
       )
       SELECT 
         p.id,
         p.name,
-        json_agg(
-          json_build_object(
-            'id', aa.apartment_id,
-            'name', aa.apartment_name,
-            'maxGuests', aa.max_guests
-          )
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'id', aa.apartment_id,
+              'name', aa.apartment_name,
+              'maxGuests', aa.max_guests
+            )
+          ) FILTER (WHERE aa.apartment_id IS NOT NULL),
+          '[]'
         ) as apartments
       FROM properties p
-      JOIN available_apartments aa ON aa.property_id = p.id
+      LEFT JOIN available_apartments aa ON p.id = aa.property_id
+      WHERE p.user_id = ${userId}
       GROUP BY p.id, p.name
     `;
 
-    const properties: AvailableProperty[] = [];
-    for await (const row of query) {
-      properties.push(row);
+    try {
+      const properties: AvailableProperty[] = [];
+      for await (const row of query) {
+        properties.push(row);
+      }
+      return properties;
+    } catch (error) {
+      console.error("Database error in getAvailableProperties:", error);
+      throw new Error(
+        `Failed to fetch available properties: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
-    return properties;
   },
 };
+
+
+
+
 

@@ -55,7 +55,7 @@
     "date-fns": "^4.1.0",
     "declarative-routing": "^0.1.20",
     "drizzle-orm": "^0.38.4",
-    "encore.dev": "^1.46.11",
+    "encore.dev": "^1.46.12",
     "framer-motion": "^12.4.10",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.473.0",

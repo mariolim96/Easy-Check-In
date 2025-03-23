@@ -5,15 +5,11 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { format } from "date-fns";
-import { CalendarIcon, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-import { Encore } from "@/lib/encore-client";
-
-import { cn } from "@/lib/utils";
+import { Encore } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+
 import {
   Form,
   FormControl,
@@ -22,11 +18,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -40,19 +32,18 @@ import { Bookings } from "@/routes";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/custom/datePicker";
 
-// Modify the form schema to split it into search and booking parts
 const searchSchema = z.object({
   checkIn: z.date({
     required_error: "Check-in date is required",
-  }),
+  }).optional(),
   checkOut: z.date({
     required_error: "Check-out date is required",
-  }),
+  }).optional(),
   guestCount: z.coerce
     .number({
       required_error: "Number of guests is required",
     })
-    .min(1, "At least one guest is required"),
+    .min(1, "At least one guest is required").optional(),
 });
 
 const formSchema = searchSchema.extend({
@@ -100,8 +91,8 @@ export default function CreateBookingPage() {
     queryFn: async () => {
       if (!searchSubmitted) return { properties: [] };
       return await Encore.Property.getAvailableProperties({
-        dateFrom: checkIn?.toISOString(),
-        dateTo: checkOut?.toISOString(),
+        dateFrom: checkIn?.toISOString().split('T')[0],
+        dateTo: checkOut?.toISOString().split('T')[0],
         guestCount,
       });
     },
@@ -109,9 +100,13 @@ export default function CreateBookingPage() {
   });
 
   const handleSearch = async () => {
-    const searchResult = await form.trigger(["checkIn", "checkOut", "guestCount"]);
+    const searchResult = await form.trigger([
+      "checkIn",
+      "checkOut",
+      "guestCount",
+    ]);
     if (!searchResult) return;
-    
+
     setSearchSubmitted(true);
     await refetchProperties();
   };
@@ -138,7 +133,7 @@ export default function CreateBookingPage() {
 
   return (
     <div className="space-y-6">
-      <div className="container mx-auto p-6 bg-white">
+      <div className="container mx-auto bg-white p-6">
         <h1 className="mb-6 text-3xl font-bold">Create New Booking</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -217,7 +212,10 @@ export default function CreateBookingPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Property</FormLabel>
-                      <Select onValueChange={handlePropertyChange} value={field.value}>
+                      <Select
+                        onValueChange={handlePropertyChange}
+                        value={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a property" />
@@ -242,7 +240,10 @@ export default function CreateBookingPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Apartment</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select an apartment" />
@@ -252,8 +253,12 @@ export default function CreateBookingPage() {
                           {availableProperties?.properties
                             .find((p) => p.id === selectedPropertyId)
                             ?.apartments.map((apartment) => (
-                              <SelectItem key={apartment.id} value={apartment.id}>
-                                {apartment.name} (Max guests: {apartment.maxGuests})
+                              <SelectItem
+                                key={apartment.id}
+                                value={apartment.id}
+                              >
+                                {apartment.name} (Max guests:{" "}
+                                {apartment.maxGuests})
                               </SelectItem>
                             ))}
                         </SelectContent>
@@ -392,7 +397,3 @@ export default function CreateBookingPage() {
     </div>
   );
 }
-
-
-
-

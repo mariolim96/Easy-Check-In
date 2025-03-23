@@ -122,7 +122,9 @@ export const getProperty = api(
 
 export const getAvailableProperties = api(
   { method: "GET", path: "/properties/available", expose: true, auth: true },
-  async (params: GetAvailablePropertiesParams): Promise<GetAvailablePropertiesResponse> => {
+  async (
+    params: GetAvailablePropertiesParams,
+  ): Promise<GetAvailablePropertiesResponse> => {
     const userId = validateAuth();
 
     try {
@@ -130,9 +132,9 @@ export const getAvailableProperties = api(
         userId,
         params.dateFrom,
         params.dateTo,
-        params.guestCount
+        params.guestCount,
       );
-      
+
       return { properties: availableProperties };
     } catch (error) {
       throw APIError.internal("Failed to fetch available properties", {
@@ -141,6 +143,5 @@ export const getAvailableProperties = api(
         message: error instanceof Error ? error.message : "Unknown error",
       });
     }
-  }
+  },
 );
-

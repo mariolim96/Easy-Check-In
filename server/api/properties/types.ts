@@ -65,4 +65,3 @@ export interface AvailableProperty {
 export interface GetAvailablePropertiesResponse {
   properties: AvailableProperty[];
 }
-

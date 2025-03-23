@@ -4,7 +4,6 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "lucide-react";
 
-
 interface BookingDetailsProps {
   selectedBooking: Booking | null;
   selectedDate: Date;
