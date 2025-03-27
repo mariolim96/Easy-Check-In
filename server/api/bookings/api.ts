@@ -1,4 +1,5 @@
 import { api, APIError } from "encore.dev/api";
+import { getAuthData } from "~encore/auth";
 import { bookingQueries } from "./db";
 import type {
   CreateBookingParams,
@@ -6,6 +7,8 @@ import type {
   ListBookingsParams,
   BookingResponse,
   ListBookingsResponse,
+  GetUserBookingsResponse,
+  BookingWithDetails,
 } from "./types";
 
 export const createBooking = api(
@@ -46,5 +49,26 @@ export const listBookings = api(
   async (params: ListBookingsParams): Promise<ListBookingsResponse> => {
     const bookings = await bookingQueries.listBookings(params);
     return { bookings };
+  },
+);
+
+export const getUserBookings = api(
+  { method: "GET", path: "/bookings/user", expose: true, auth: true },
+  async (): Promise<GetUserBookingsResponse> => {
+    const auth = getAuthData();
+    if (!auth?.userID) {
+      throw APIError.unauthenticated("User not authenticated");
+    }
+
+    try {
+      const bookings = await bookingQueries.getBookingsByUser(auth.userID);
+      return { bookings };
+    } catch (error) {
+      throw APIError.internal("Failed to fetch user bookings", {
+        cause: error,
+        name: "DatabaseError",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
   },
 );

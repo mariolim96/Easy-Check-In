@@ -65,6 +65,16 @@ const BOOKING_SOURCES = {
   OTHER: "other",
 };
 
+const formatDate = (dateString: string | null | undefined) => {
+  if (!dateString) return "N/A";
+  try {
+    return format(new Date(dateString), "MMM d, yyyy");
+  } catch (error) {
+    console.error("Error formatting date:", dateString, error);
+    return "Invalid date";
+  }
+};
+
 export default function BookingsPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -72,96 +82,49 @@ export default function BookingsPage() {
   const [filterApartment, setFilterApartment] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  // Fetch bookings
+  // Fetch all bookings without filtering
   const { data: bookingsData, isLoading } = useQuery({
-    queryKey: ["bookings", filterStatus, filterApartment],
+    queryKey: ["bookings"],
     queryFn: async () => {
-      const params: ListBookingsParams = {};
-      if (filterStatus !== "all") params.status = filterStatus;
-      if (filterApartment !== "all") params.apartmentId = filterApartment;
-      // const res = await Encore.Booking.listBookings(params);
-      // const response = await Encore.Booking.listBookings({
-      //   apartmentId: filterApartment !== "all" ? filterApartment : undefined,
-      //   status: filterStatus !== "all" ? filterStatus : undefined,
-      //   fromDate: undefined,
-      //   toDate: undefined,
-      // });
-      const response = {
-        bookings: [
-          {
-            id: "mock-1",
-            apartmentId: "Apartment 101",
-            checkIn: new Date().toISOString(),
-            checkOut: new Date(
-              Date.now() + 7 * 24 * 60 * 60 * 1000,
-            ).toISOString(),
-            guestCount: 2,
-            source: "airbnb",
-            status: "confirmed",
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: "mock-2",
-            apartmentId: "Apartment 102",
-            checkIn: new Date(
-              Date.now() + 14 * 24 * 60 * 60 * 1000,
-            ).toISOString(),
-            checkOut: new Date(
-              Date.now() + 21 * 24 * 60 * 60 * 1000,
-            ).toISOString(),
-            guestCount: 3,
-            source: "booking",
-            externalId: "BOK123",
-            status: "pending",
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          {
-            id: "mock-3",
-            apartmentId: "Apartment 103",
-            checkIn: new Date(
-              Date.now() - 7 * 24 * 60 * 60 * 1000,
-            ).toISOString(),
-            checkOut: new Date().toISOString(),
-            guestCount: 1,
-            source: "direct",
-            status: "completed",
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ],
-      };
-
+      const response = await Encore.Booking.getUserBookings();
       return response;
     },
   });
 
+  // Apply filters and sorting outside of the query
+  const getFilteredBookings = () => {
+    if (!bookingsData?.bookings) return [];
+
+    return bookingsData.bookings
+      .filter((booking) => {
+        const statusMatch =
+          filterStatus === "all" || booking.status === filterStatus;
+        const apartmentMatch =
+          filterApartment === "all" || booking.apartment_id === filterApartment;
+        const searchMatch =
+          !searchQuery ||
+          booking.apartment_name
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          booking.property_name
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase());
+
+        return statusMatch && apartmentMatch && searchMatch;
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.check_in).getTime();
+        const dateB = new Date(b.check_in).getTime();
+        return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+      });
+  };
+
+  const filteredBookings = getFilteredBookings();
   // Fetch apartments for filter
   const { data: propertiesData } = useQuery({
     queryKey: ["properties"],
     queryFn: () => Encore.Property.getProperties(),
   });
-
-  const filteredBookings =
-    bookingsData?.bookings
-      .filter((booking) => {
-        // if (searchQuery) {
-        //   const query = searchQuery.toLowerCase();
-        //   return (
-        //     booking.apartmentId.toLowerCase().includes(query) ||
-        //     booking.source.toLowerCase().includes(query) ||
-        //     (booking.externalId &&
-        //       booking.externalId.toLowerCase().includes(query))
-        //   );
-        // }
-        return true;
-      })
-      .sort((a, b) => {
-        const dateA = new Date(a.checkIn).getTime();
-        const dateB = new Date(b.checkIn).getTime();
-        return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-      }) ?? [];
 
   const toggleSortOrder = () => {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -215,14 +178,14 @@ export default function BookingsPage() {
             placeholder="Search bookings..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 md:w-80"
+            className="w-full bg-background pl-10 md:w-80"
           />
           <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
         </div>
 
         <div className="flex flex-col gap-4 sm:flex-row">
           <Select value={filterApartment} onValueChange={setFilterApartment}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-40 border bg-background hover:bg-accent">
               <Building2 className="mr-2 h-4 w-4" />
               <SelectValue placeholder="All Apartments" />
             </SelectTrigger>
@@ -239,7 +202,7 @@ export default function BookingsPage() {
           </Select>
 
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-40 border bg-background hover:bg-accent">
               <Filter className="mr-2 h-4 w-4" />
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
@@ -271,7 +234,7 @@ export default function BookingsPage() {
               <TableHead>Guests</TableHead>
               <TableHead>Source</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -294,16 +257,12 @@ export default function BookingsPage() {
               filteredBookings.map((booking, id) => (
                 <TableRow
                   key={booking.id}
-                  className={` ${id % 2 !== 0 ? "bg-primary-foreground/70" : "bg-primary-foreground"}`}
+                  className={`${id % 2 !== 0 ? "bg-primary-foreground/70" : "bg-primary-foreground"}`}
                 >
-                  <TableCell>{booking.apartmentId}</TableCell>
-                  <TableCell>
-                    {format(new Date(booking.checkIn), "MMM d, yyyy")}
-                  </TableCell>
-                  <TableCell>
-                    {format(new Date(booking.checkOut), "MMM d, yyyy")}
-                  </TableCell>
-                  <TableCell>{booking.guestCount} guests</TableCell>
+                  <TableCell>{booking.apartment_name}</TableCell>
+                  <TableCell>{booking.check_in}</TableCell>
+                  <TableCell>{booking.check_out}</TableCell>
+                  <TableCell>{booking.guest_count} guests</TableCell>
                   <TableCell>
                     <div
                       className={cn(
@@ -324,7 +283,7 @@ export default function BookingsPage() {
                       {booking.status}
                     </div>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
@@ -333,31 +292,16 @@ export default function BookingsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                        // onClick={() => router.push(`/bookings/${booking.id}`)}
-                        >
+                        <DropdownMenuItem>
                           <Eye className="mr-2 h-4 w-4" />
                           View details
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                        // onClick={() =>
-                        //   router.push(`/bookings/${booking.id}/edit`)
-                        // }
-                        >
+                        <DropdownMenuItem>
                           <FileEdit className="mr-2 h-4 w-4" />
                           Edit booking
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onClick={() => {
-                            // Handle cancellation
-                            // Encore.Booking.updateBookingStatus({
-                            //   bookingId: booking.id,
-                            //   status: BOOKING_STATUSES.CANCELLED,
-                            // });
-                          }}
-                        >
+                        <DropdownMenuItem className="text-destructive">
                           <Trash2 className="mr-2 h-4 w-4" />
                           Cancel booking
                         </DropdownMenuItem>

@@ -1,16 +1,27 @@
 import { db } from "../../db/db";
-import type { Booking, CreateBookingParams, ListBookingsParams } from "./types";
+import type {
+  Booking,
+  BookingWithDetails,
+  CreateBookingParams,
+  ListBookingsParams,
+} from "./types";
 
 export const bookingQueries = {
   async createBooking(params: CreateBookingParams): Promise<Booking> {
     const result = db.query<Booking>`
       INSERT INTO bookings (
         apartment_id, check_in, check_out, guest_count,
-        source, external_id, status
+        "source", external_id, status, notes, amount
       ) VALUES (
-        ${params.apartmentId}, ${params.checkIn}, ${params.checkOut},
-        ${params.guestCount}, ${params.source}, ${params.externalId ?? null},
-        ${params.status}
+        ${params.apartmentId}::uuid,
+        ${params.checkIn},
+        ${params.checkOut},
+        ${params.guestCount},
+        ${params.source}::text,
+        ${params.externalId ?? null},
+        ${params.status},
+        ${params.notes ?? null},
+        ${params.amount.toString()}
       )
       RETURNING *
     `;
@@ -18,7 +29,7 @@ export const bookingQueries = {
     for await (const booking of result) {
       return booking;
     }
-    throw new Error("Failed to create booking");
+    throw new Error("Failed to create booking" + JSON.stringify(params));
   },
 
   async getBooking(bookingId: string): Promise<Booking | null> {
@@ -66,6 +77,26 @@ export const bookingQueries = {
     `;
 
     const bookings: Booking[] = [];
+    for await (const booking of result) {
+      bookings.push(booking);
+    }
+    return bookings;
+  },
+
+  async getBookingsByUser(userId: string): Promise<BookingWithDetails[]> {
+    const result = db.query<BookingWithDetails>`
+      SELECT 
+        b.*,
+        a.name as apartment_name,
+        p.name as property_name
+      FROM bookings b
+      JOIN apartments a ON b.apartment_id = a.id
+      JOIN properties p ON a.property_id = p.id
+      WHERE p.user_id = ${userId}
+      ORDER BY b.check_in DESC
+    `;
+
+    const bookings: BookingWithDetails[] = [];
     for await (const booking of result) {
       bookings.push(booking);
     }

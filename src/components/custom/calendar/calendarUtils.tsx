@@ -1,6 +1,5 @@
 import { Booking } from "./types";
-import { format, isSameDay, isWithinInterval } from "date-fns";
-import { DayContentProps } from "react-day-picker";
+import { isSameDay, isWithinInterval } from "date-fns";
 
 export const hasBookings = (day: Date, bookings: Booking[]) => {
   return bookings.some((booking) => {

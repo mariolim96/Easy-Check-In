@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Booking } from "./calendar/types";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
 import { getBookingForDate } from "./calendar/calendarUtils";
 import CalendarDayContent from "./calendar/calendarDayContent";
 import BookingDetails from "./calendar/bookingDetails";
@@ -19,7 +18,7 @@ const BookingCalendar = ({ bookings }: BookingCalendarProps) => {
   const handleDateSelect = (day: Date) => {
     setDate(day);
     const booking = getBookingForDate(day, bookings);
-    setSelectedBooking(booking || null);
+    setSelectedBooking(booking ?? null);
   };
 
   return (

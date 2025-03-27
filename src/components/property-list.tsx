@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Properties, CreateProperty } from "@/routes";
+import { CreateProperty } from "@/routes";
 import { Encore } from "@/lib/utils";
 
 interface PropertyListProps {

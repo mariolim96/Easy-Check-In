@@ -130,9 +130,9 @@ export const getAvailableProperties = api(
     try {
       const availableProperties = await propertyQueries.getAvailableProperties(
         userId,
-        params.dateFrom,
-        params.dateTo,
-        params.guestCount,
+        params.dateFrom ?? "",
+        params.dateTo ?? "",
+        params.guestCount ?? 0,
       );
 
       return { properties: availableProperties };

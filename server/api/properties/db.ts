@@ -127,17 +127,11 @@ export const propertyQueries = {
 
   async getAvailableProperties(
     userId: string,
-    dateFrom?: string,
-    dateTo?: string,
-    guestCount?: number,
+    dateFrom: string,
+    dateTo: string,
+    guestCount: number,
   ) {
-    // ${
-    //   dateFrom && dateTo
-    //     ? `AND (${dateFrom}::date <= b.check_out AND ${dateTo}::date >= b.check_in)`
-    //     : ``
-    // }
-    const hasDates = !(dateFrom && dateTo);
-    const query = db.query<AvailableProperty>`
+    const result = db.query<AvailableProperty>`
       WITH available_apartments AS (
         SELECT 
           a.id as apartment_id,
@@ -147,11 +141,16 @@ export const propertyQueries = {
           p.name as property_name
         FROM apartments a
         JOIN properties p ON p.id = a.property_id
-        LEFT JOIN bookings b ON b.apartment_id = a.id
-        //   AND COALESCE(b.check_out < ${dateFrom ?? ''}::date OR b.check_in > ${dateTo ?? }::date, FALSE)
         WHERE p.user_id = ${userId}
-        AND (${guestCount ?? 0} = 0 OR a.max_guests >= ${guestCount ?? 0})
-        AND b.id IS NULL
+          AND (${guestCount} = 0 OR a.max_guests >= ${guestCount})
+          AND NOT EXISTS (
+            SELECT 1 FROM bookings b
+            WHERE b.apartment_id = a.id
+              AND (
+                (b.check_in <= ${dateFrom} AND b.check_out > ${dateFrom})
+                OR (b.check_in < ${dateTo} AND b.check_out >= ${dateTo})
+              )
+          )
       )
       SELECT 
         p.id,
@@ -164,7 +163,7 @@ export const propertyQueries = {
               'maxGuests', aa.max_guests
             )
           ) FILTER (WHERE aa.apartment_id IS NOT NULL),
-          '[]'
+          '[]'::json
         ) as apartments
       FROM properties p
       LEFT JOIN available_apartments aa ON p.id = aa.property_id
@@ -174,7 +173,7 @@ export const propertyQueries = {
 
     try {
       const properties: AvailableProperty[] = [];
-      for await (const row of query) {
+      for await (const row of result) {
         properties.push(row);
       }
       return properties;
@@ -186,8 +185,3 @@ export const propertyQueries = {
     }
   },
 };
-
-
-
-
-

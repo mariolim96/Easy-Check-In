@@ -5,8 +5,10 @@ export interface Booking {
   checkOut: string;
   guestCount: number;
   source: string;
-  externalId?: string;
+  externalId: string | null;
   status: string;
+  amount: number;
+  notes: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -17,8 +19,10 @@ export interface CreateBookingParams {
   checkOut: string;
   guestCount: number;
   source: string;
-  externalId?: string;
+  externalId: string | null;
   status: string;
+  amount: number;
+  notes: string | null;
 }
 
 export interface UpdateBookingParams {
@@ -27,10 +31,10 @@ export interface UpdateBookingParams {
 }
 
 export interface ListBookingsParams {
-  apartmentId?: string;
-  status?: string;
-  fromDate?: string;
-  toDate?: string;
+  apartmentId: string | null;
+  status: string | null;
+  fromDate: string | null;
+  toDate: string | null;
 }
 
 export interface BookingResponse {
@@ -39,4 +43,25 @@ export interface BookingResponse {
 
 export interface ListBookingsResponse {
   bookings: Booking[];
+}
+
+export interface BookingWithDetails {
+  id: string;
+  apartment_id: string; // Note: using snake_case to match DB
+  apartment_name: string;
+  property_name: string;
+  check_in: string;
+  check_out: string;
+  guest_count: number;
+  source: string;
+  external_id: string | null;
+  status: string;
+  amount: string; // Changed to string since it comes as "0.01"
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GetUserBookingsResponse {
+  bookings: BookingWithDetails[];
 }
