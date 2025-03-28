@@ -17,6 +17,7 @@ import * as DashboardAdminRoute from "@/app/(dashboard)/admin/page.info";
 import * as DashboardUserRoute from "@/app/(dashboard)/user/page.info";
 import * as BookingsRoute from "@/app/bookings/page.info";
 import * as CreateBookingRoute from "@/app/bookings/create/page.info";
+import * as CreateGuestRoute from "@/app/guests/create/page.info";
 import * as PropertiesRoute from "@/app/properties/page.info";
 import * as PropertyDetailRoute from "@/app/properties/[propertyId]/page.info";
 import * as CreatePropertyRoute from "@/app/properties/create/page.info";
@@ -64,6 +65,10 @@ export const Bookings = makeRoute("/bookings", {
 export const CreateBooking = makeRoute("/bookings/create", {
   ...defaultInfo,
   ...CreateBookingRoute.Route,
+});
+export const CreateGuest = makeRoute("/guests/create", {
+  ...defaultInfo,
+  ...CreateGuestRoute.Route,
 });
 export const Properties = makeRoute("/properties", {
   ...defaultInfo,

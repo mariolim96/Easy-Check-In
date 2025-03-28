@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation"; // Removed
 import {
   Calendar,
   Filter,
@@ -14,6 +14,7 @@ import {
   FileEdit,
   Trash2,
   Plus,
+  UserPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,7 +45,7 @@ import { Encore } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { usePush } from "@/routes/hooks";
-import { Bookings, CreateBooking } from "@/routes";
+import { Bookings, CreateBooking, CreateGuest } from "@/routes";
 import { string } from "zod";
 import {
   Booking,
@@ -76,7 +77,7 @@ const formatDate = (dateString: string | null | undefined) => {
 };
 
 export default function BookingsPage() {
-  const router = useRouter();
+  // const router = useRouter(); // Removed
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterApartment, setFilterApartment] = useState<string>("all");
@@ -131,7 +132,7 @@ export default function BookingsPage() {
   };
 
   const handleAddBooking = () => {
-    router.push(CreateBooking());
+    window.location.href = CreateBooking();
   };
 
   const getStatusStyle = (status: string) => {
@@ -166,10 +167,12 @@ export default function BookingsPage() {
           </p>
         </div>
 
-        <Button onClick={handleAddBooking}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Booking
-        </Button>
+        <CreateBooking.Link>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Booking
+          </Button>
+        </CreateBooking.Link>
       </div>
 
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -300,6 +303,14 @@ export default function BookingsPage() {
                           <FileEdit className="mr-2 h-4 w-4" />
                           Edit booking
                         </DropdownMenuItem>
+                        <CreateGuest.ParamsLink
+                          search={{ guestCount: booking.guest_count }}
+                        >
+                          <DropdownMenuItem>
+                            <UserPlus className="mr-2 h-4 w-4" />
+                            Add guests
+                          </DropdownMenuItem>
+                        </CreateGuest.ParamsLink>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive">
                           <Trash2 className="mr-2 h-4 w-4" />
