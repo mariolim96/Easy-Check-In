@@ -33,11 +33,17 @@ CREATE TABLE IF NOT EXISTS "apartments" (
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create index for better query performance
+DROP TABLE IF EXISTS "guest_documents";
+
+DROP TABLE IF EXISTS "guests";
+
+DROP TABLE IF EXISTS "bookings";
+
+DROP TABLE IF EXISTS "alloggiati_submissions";
+
 CREATE TABLE IF NOT EXISTS "bookings" (
     "id" UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     "apartment_id" UUID NOT NULL REFERENCES "apartments" ("id") ON DELETE CASCADE,
-    "main_guest_id" UUID NOT NULL REFERENCES "guest_documents" ("guest_id") ON DELETE CASCADE,
     "check_in" DATE NOT NULL,
     "check_out" DATE NOT NULL,
     "guest_count" INTEGER NOT NULL,
@@ -45,31 +51,19 @@ CREATE TABLE IF NOT EXISTS "bookings" (
     "external_id" TEXT,
     "status" TEXT NOT NULL,
     "notes" TEXT,
-    "amount" DECIMAL(10, 2),
-    "guests" UUID[] DEFAULT ARRAY[]::UUID[],
+    "amount" TEXT,
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS "guests" (
     "id" UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-    "booking_id" UUID NOT NULL REFERENCES "bookings" ("id") ON DELETE CASCADE,
-    "guest_type" TEXT CHECK (
-        guest_type IN (
-            'group_leader',
-            'family_head',
-            'single_guest',
-            'family_member',
-            'group_member'
-        )
-    ),
     "first_name" TEXT,
     "last_name" TEXT,
     "gender" TEXT NOT NULL DEFAULT 'M' CHECK (gender IN ('M', 'F')),
     "date_of_birth" DATE,
     "place_of_birth" TEXT,
     "nationality" TEXT,
-    "is_main_guest" BOOLEAN DEFAULT FALSE,
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -88,36 +82,61 @@ CREATE TABLE IF NOT EXISTS "guest_documents" (
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Add new required fields for Alloggiati Web
--- ALTER TABLE "guests"
--- ADD COLUMN IF NOT EXISTS "stay_length" INTEGER NOT NULL DEFAULT 1,
--- Update alloggiati_submissions table
-
-
--- Add a constraint to ensure only one main guest per booking
-CREATE UNIQUE INDEX idx_main_guest_per_booking ON "guests" (booking_id)
-WHERE
-    is_main_guest = TRUE;
-
 CREATE TABLE IF NOT EXISTS "alloggiati_submissions" (
     "id" UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-    "property_id" UUID NOT NULL REFERENCES "properties" ("id") ON DELETE CASCADE,
     "booking_id" UUID NOT NULL REFERENCES "bookings" ("id") ON DELETE CASCADE,
-    "group_leader_id" UUID REFERENCES "guests" ("id"),
     "submission_date" TIMESTAMP NOT NULL,
-    "submission_type" TEXT NOT NULL DEFAULT 'single' CHECK (submission_type IN ('single', 'family', 'group')),
-    "receipt_url" TEXT NOT NULL,
     "status" TEXT NOT NULL,
     "response_data" JSONB,
+    "transmitted_data" JSONB,
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS "booking_guests" (
+    "booking_id" UUID NOT NULL REFERENCES "bookings" ("id") ON DELETE CASCADE,
+    "guest_id" UUID NOT NULL REFERENCES "guests" ("id") ON DELETE CASCADE,
+    "guest_type" TEXT DEFAULT 'group_member' CHECK (
+        guest_type IN (
+            'group_leader',
+            'family_head',
+            'single_guest',
+            'family_member',
+            'group_member'
+        )
+    ),
+    "check_in" DATE NOT NULL,
+    "check_out" DATE NOT NULL,
+    "alloggiati_submission_id" UUID REFERENCES "alloggiati_submissions" ("id"),
+    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("booking_id", "guest_id")
+);
+
+CREATE UNIQUE INDEX idx_one_main_guest_per_booking ON "booking_guests" ("booking_id")
+WHERE
+    guest_type IS NOT NULL;
+
+CREATE INDEX idx_booking_guests_booking_id ON "booking_guests" ("booking_id");
+
+CREATE INDEX idx_booking_guests_guest_id ON "booking_guests" ("guest_id");
+
+
+
+--
+--     "property_id" UUID NOT NULL REFERENCES "properties" ("id") ON DELETE CASCADE,
+--     "booking_id" UUID NOT NULL REFERENCES "bookings" ("id") ON DELETE CASCADE,
+--     "group_leader_id" UUID REFERENCES "guests" ("id"),
+--     "submission_date" TIMESTAMP NOT NULL,
+--     "submission_type" TEXT NOT NULL DEFAULT 'single' CHECK (submission_type IN ('single', 'family', 'group')),
+--     "status" TEXT NOT NULL,
+--     "response_data" JSONB,
+--     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 -- ALTER TABLE "alloggiati_submissions"
 -- ADD COLUMN IF NOT EXISTS "submission_number" TEXT,
 -- ADD COLUMN IF NOT EXISTS "error_details" TEXT,
 -- ADD COLUMN IF NOT EXISTS "transmitted_data" JSONB;
-
 -- Add constraint to ensure group_leader_id is set for family/group submissions
 -- ALTER TABLE "alloggiati_submissions" ADD CONSTRAINT check_group_leader CHECK (
 --     (
@@ -129,8 +148,6 @@ CREATE TABLE IF NOT EXISTS "alloggiati_submissions" (
 --         AND group_leader_id IS NOT NULL
 --     )
 -- );
-
-
 CREATE TABLE IF NOT EXISTS "tourist_tax_reports" (
     "id" UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     "property_id" UUID NOT NULL REFERENCES "properties" ("id") ON DELETE CASCADE,
@@ -200,6 +217,7 @@ CREATE INDEX idx_alloggiati_configs_property_id ON "alloggiati_configs" ("proper
 CREATE INDEX idx_apartments_property_id ON "apartments" ("property_id");
 
 CREATE INDEX idx_bookings_apartment_id ON "bookings" ("apartment_id");
+
 CREATE INDEX idx_bookings_main_guest_id ON "bookings" ("main_guest_id");
 
 CREATE INDEX idx_guests_booking_id ON "guests" ("booking_id");

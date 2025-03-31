@@ -33,6 +33,7 @@ export default class Client {
   public readonly Alloggiati: Alloggiati.ServiceClient;
   public readonly User: User.ServiceClient;
   public readonly Booking: Booking.ServiceClient;
+  public readonly guests: guests.ServiceClient;
   public readonly Property: Property.ServiceClient;
 
   /**
@@ -46,6 +47,7 @@ export default class Client {
     this.Alloggiati = new Alloggiati.ServiceClient(base);
     this.User = new User.ServiceClient(base);
     this.Booking = new Booking.ServiceClient(base);
+    this.guests = new guests.ServiceClient(base);
     this.Property = new Property.ServiceClient(base);
   }
 }
@@ -269,6 +271,89 @@ export namespace Booking {
         JSON.stringify(params),
       );
       return (await resp.json()) as bookings.BookingResponse;
+    }
+  }
+}
+
+export namespace guests {
+  export interface CreateGuestParams {
+    firstName: string;
+    lastName: string;
+    gender: "M" | "F";
+    dateOfBirth: string;
+    placeOfBirth: string;
+    nationality: string;
+    document?: GuestDocument;
+    members?: {
+      firstName: string;
+      lastName: string;
+      gender: "M" | "F";
+      dateOfBirth: string;
+      placeOfBirth: string;
+      citizenship: string;
+      guestType: "family_member" | "group_member";
+      arrivalDate: string;
+      checkOut: string;
+    }[];
+  }
+
+  export interface CreateGuestWithBookingParams {
+    bookingId: string;
+    guest: CreateGuestParams;
+    guestType:
+      | "group_leader"
+      | "family_head"
+      | "single_guest"
+      | "family_member"
+      | "group_member";
+    checkIn: string;
+    checkOut: string;
+  }
+
+  export interface Guest {
+    id: string;
+    firstName: string;
+    lastName: string;
+    gender: "M" | "F";
+    dateOfBirth: string;
+    placeOfBirth: string;
+    nationality: string;
+    createdAt: string;
+    updatedAt: string;
+  }
+
+  export interface GuestDocument {
+    documentIssueDate: string;
+    documentExpiryDate: string;
+    documentIssuePlace: string;
+    documentType: string;
+    documentNumber: string;
+    documentScan?: string;
+    documentIssueCountry: string;
+  }
+
+  export interface GuestResponse {
+    guest: Guest;
+    document: GuestDocument;
+  }
+
+  export class ServiceClient {
+    private baseClient: BaseClient;
+
+    constructor(baseClient: BaseClient) {
+      this.baseClient = baseClient;
+    }
+
+    public async createGuestWithBooking(
+      params: CreateGuestWithBookingParams,
+    ): Promise<GuestResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/guests/booking`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as GuestResponse;
     }
   }
 }

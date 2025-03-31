@@ -131,10 +131,6 @@ export default function BookingsPage() {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
 
-  const handleAddBooking = () => {
-    window.location.href = CreateBooking();
-  };
-
   const getStatusStyle = (status: string) => {
     const styles = {
       [BOOKING_STATUSES.CONFIRMED]: "bg-green-100 text-green-700",
@@ -304,7 +300,12 @@ export default function BookingsPage() {
                           Edit booking
                         </DropdownMenuItem>
                         <CreateGuest.ParamsLink
-                          search={{ guestCount: booking.guest_count }}
+                          search={{
+                            guestCount: booking.guest_count,
+                            checkIn: booking.check_in,
+                            checkOut: booking.check_out,
+                            bookingId: booking.id,
+                          }}
                         >
                           <DropdownMenuItem>
                             <UserPlus className="mr-2 h-4 w-4" />

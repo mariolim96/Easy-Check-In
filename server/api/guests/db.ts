@@ -1,68 +1,85 @@
 import { db } from "../../db/db";
-import type { CreateGuestParams, Guest, Member } from "./types";
+import type {
+  CreateGuestParams,
+  Guest,
+  GuestDocument,
+  CreateBookingGuestParams,
+} from "./types";
 
 export const guestQueries = {
   async createGuest(params: CreateGuestParams): Promise<Guest> {
     const result = db.query<Guest>`
-      WITH inserted_guest AS (
-        INSERT INTO guests (
-          guest_type, arrival_date, stay_length, citizenship,
-          place_of_birth, first_name, last_name, date_of_birth,
-          gender, document_issue_place, document_type, document_number,
-          created_at, updated_at
-        ) VALUES (
-          ${params.guestType}, ${params.arrivalDate}, ${params.stayLength},
-          ${params.citizenship}, ${params.placeOfBirth}, ${params.firstName},
-          ${params.lastName}, ${params.dateOfBirth}, ${params.gender},
-          ${params.documentIssuePlace}, ${params.documentType},
-          ${params.documentNumber}, NOW(), NOW()
-        )
-        RETURNING *
+      INSERT INTO guests (
+        first_name, last_name, gender, date_of_birth,
+        place_of_birth, nationality
+      ) VALUES (
+        ${params.firstName},
+        ${params.lastName},
+        ${params.gender},
+        ${params.dateOfBirth}::date,
+        ${params.placeOfBirth},
+        ${params.nationality}
       )
-      SELECT * FROM inserted_guest
+      RETURNING *
     `;
 
-    let guest: Guest | null = null;
-    for await (const row of result) {
-      guest = row;
+    for await (const guest of result) {
+      return guest;
     }
+    throw new Error("Failed to create guest");
+  },
 
-    if (!guest) {
-      throw new Error("Failed to create guest");
+  async createGuestDocument(guestId: string, document: GuestDocument) {
+    const result = db.query`
+      INSERT INTO guest_documents (
+        guest_id,
+        document_issue_date,
+        document_expiry_date,
+        document_issue_place,
+        document_type,
+        document_number,
+        document_scan,
+        document_issue_country
+      ) VALUES (
+        ${guestId}::uuid,
+        ${document.documentIssueDate}::date,
+        ${document.documentExpiryDate}::date,
+        ${document.documentIssuePlace},
+        ${document.documentType},
+        ${document.documentNumber},
+        ${document.documentScan ?? null},
+        ${document.documentIssueCountry}
+      )
+      RETURNING *
+    `;
+
+    for await (const doc of result) {
+      return doc;
     }
+    throw new Error("Failed to create guest document");
+  },
 
-    // If there are members, insert them
-    if (params.members && params.members.length > 0) {
-      const memberResults = db.query<Member>`
-        INSERT INTO guest_members (
-          guest_id, stay_length, citizenship, place_of_birth,
-          first_name, last_name, date_of_birth, gender, guest_type,
-          created_at, updated_at
-        )
-        SELECT 
-          ${guest.id}, m.stay_length, m.citizenship, m.place_of_birth,
-          m.first_name, m.last_name, m.date_of_birth, m.gender, m.guest_type,
-          NOW(), NOW()
-        FROM jsonb_to_recordset(${JSON.stringify(params.members)}::jsonb) AS m(
-          stay_length int,
-          citizenship text,
-          place_of_birth text,
-          first_name text,
-          last_name text,
-          date_of_birth text,
-          gender text,
-          guest_type text
-        )
-        RETURNING *
-      `;
+  async linkGuestToBooking(params: CreateBookingGuestParams) {
+    const result = db.query`
+      INSERT INTO booking_guests (
+        booking_id,
+        guest_id,
+        guest_type,
+        check_in,
+        check_out
+      ) VALUES (
+        ${params.bookingId}::uuid,
+        ${params.guestId}::uuid,
+        ${params.guestType},
+        ${params.checkIn}::date,
+        ${params.checkOut}::date
+      )
+      RETURNING *
+    `;
 
-      const members: Member[] = [];
-      for await (const member of memberResults) {
-        members.push(member);
-      }
-      guest.members = members;
+    for await (const bookingGuest of result) {
+      return bookingGuest;
     }
-
-    return guest;
+    throw new Error("Failed to link guest to booking");
   },
 };
