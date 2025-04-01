@@ -29,7 +29,6 @@ export default function SignIn() {
   const router = useRouter();
 
   const [pendingCredentials, setPendingCredentials] = useState(false);
-  // const [pendingGithub, setPendingGithub] = useState(false);
 
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -52,21 +51,12 @@ export default function SignIn() {
           setPendingCredentials(true);
         },
         onSuccess: async (response) => {
-          console.log("response:", response);
-          //   if (!response?.emailVerified) {
-          //   }
           router.push(Home());
           router.refresh();
           toast.success("Successfully signed in!", {
             description: "You have successfully signed in!",
           });
         },
-        // onError: (ctx: ErrorContext) => {
-        //   toast.error("Something went wrong!", {
-        //     description: ctx.error.message ?? "Something went wrong.",
-        //   });
-        //   return ''
-        // },
         onError: (context: ErrorContext): void | Promise<void> => {
           toast.error("Something went wrong!", {
             description: context.error.message ?? "Something went wrong.",
@@ -139,7 +129,9 @@ export default function SignIn() {
                   )}
                 />
               ))}
-              <Button className="w-full">Sign in</Button>
+              <Button pending={pendingCredentials} className="w-full">
+                Sign in
+              </Button>
             </form>
           </Form>
           <div className="mt-4">

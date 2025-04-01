@@ -105,7 +105,7 @@ export default function CreateBookingPage() {
     await refetchProperties();
   };
 
-  const handleInputChange = (field: keyof BookingFormData, value: any) => {
+  const handleInputChange = (field: keyof BookingFormData, value: unknown) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error when field is modified
     if (errors[field]) {
@@ -354,7 +354,7 @@ export default function CreateBookingPage() {
                   </label>
                   <Select
                     value={formData.platform}
-                    onValueChange={(value: any) =>
+                    onValueChange={(value) =>
                       handleInputChange("platform", value)
                     }
                   >
@@ -376,7 +376,7 @@ export default function CreateBookingPage() {
                   </label>
                   <Select
                     value={formData.status}
-                    onValueChange={(value: any) =>
+                    onValueChange={(value) =>
                       handleInputChange("status", value)
                     }
                   >

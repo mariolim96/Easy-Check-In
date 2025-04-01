@@ -66,3 +66,33 @@ export interface CreateGuestWithBookingParams {
   checkIn: string;
   checkOut: string;
 }
+
+export interface GuestListItem {
+  id: string;
+  firstName: string;
+  lastName: string;
+  guestType: string;
+  checkIn: string;
+  checkOut: string;
+  document: {
+    documentType: string;
+    documentNumber: string;
+    documentIssueCountry: string;
+  };
+  property: {
+    id: string;
+    name: string;
+    apartment: {
+      id: string;
+      name: string;
+    };
+  };
+  alloggiatiStatus: "pending" | "submitted" | "error";
+  members?: GuestListItem[];
+  bookingId: string;
+  parent_id?: string;
+}
+
+export interface ListGuestsResponse {
+  guests: GuestListItem[];
+}

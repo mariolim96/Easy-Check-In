@@ -3,7 +3,7 @@ import { z } from "zod";
 import { makeRoute } from "./makeRoute";
 
 const defaultInfo = {
-  search: z.object({}),
+  search: z.object({})
 };
 
 import * as HomeRoute from "@/app/page.info";
@@ -17,68 +17,122 @@ import * as DashboardAdminRoute from "@/app/(dashboard)/admin/page.info";
 import * as DashboardUserRoute from "@/app/(dashboard)/user/page.info";
 import * as BookingsRoute from "@/app/bookings/page.info";
 import * as CreateBookingRoute from "@/app/bookings/create/page.info";
+import * as GuestsRoute from "@/app/guests/page.info";
 import * as CreateGuestRoute from "@/app/guests/create/page.info";
 import * as PropertiesRoute from "@/app/properties/page.info";
 import * as PropertyDetailRoute from "@/app/properties/[propertyId]/page.info";
 import * as CreatePropertyRoute from "@/app/properties/create/page.info";
 
-export const Home = makeRoute("/", {
-  ...defaultInfo,
-  ...HomeRoute.Route,
-});
-export const AuthalloggiatiLogin = makeRoute("/(auth)/alloggiati-login", {
-  ...defaultInfo,
-  ...AuthalloggiatiLoginRoute.Route,
-});
-export const AuthEmailVerified = makeRoute("/(auth)/email-verified", {
-  ...defaultInfo,
-  ...AuthEmailVerifiedRoute.Route,
-});
-export const AuthForgotPassword = makeRoute("/(auth)/forgot-password", {
-  ...defaultInfo,
-  ...AuthForgotPasswordRoute.Route,
-});
-export const AuthResetPassword = makeRoute("/(auth)/reset-password", {
-  ...defaultInfo,
-  ...AuthResetPasswordRoute.Route,
-});
-export const AuthSignIn = makeRoute("/(auth)/sign-in", {
-  ...defaultInfo,
-  ...AuthSignInRoute.Route,
-});
-export const AuthSignUp = makeRoute("/(auth)/sign-up", {
-  ...defaultInfo,
-  ...AuthSignUpRoute.Route,
-});
-export const DashboardAdmin = makeRoute("/(dashboard)/admin", {
-  ...defaultInfo,
-  ...DashboardAdminRoute.Route,
-});
-export const DashboardUser = makeRoute("/(dashboard)/user", {
-  ...defaultInfo,
-  ...DashboardUserRoute.Route,
-});
-export const Bookings = makeRoute("/bookings", {
-  ...defaultInfo,
-  ...BookingsRoute.Route,
-});
-export const CreateBooking = makeRoute("/bookings/create", {
-  ...defaultInfo,
-  ...CreateBookingRoute.Route,
-});
-export const CreateGuest = makeRoute("/guests/create", {
-  ...defaultInfo,
-  ...CreateGuestRoute.Route,
-});
-export const Properties = makeRoute("/properties", {
-  ...defaultInfo,
-  ...PropertiesRoute.Route,
-});
-export const PropertyDetail = makeRoute("/properties/[propertyId]", {
-  ...defaultInfo,
-  ...PropertyDetailRoute.Route,
-});
-export const CreateProperty = makeRoute("/properties/create", {
-  ...defaultInfo,
-  ...CreatePropertyRoute.Route,
-});
+export const Home = makeRoute(
+  "/",
+  {
+    ...defaultInfo,
+    ...HomeRoute.Route
+  }
+);
+export const AuthalloggiatiLogin = makeRoute(
+  "/(auth)/alloggiati-login",
+  {
+    ...defaultInfo,
+    ...AuthalloggiatiLoginRoute.Route
+  }
+);
+export const AuthEmailVerified = makeRoute(
+  "/(auth)/email-verified",
+  {
+    ...defaultInfo,
+    ...AuthEmailVerifiedRoute.Route
+  }
+);
+export const AuthForgotPassword = makeRoute(
+  "/(auth)/forgot-password",
+  {
+    ...defaultInfo,
+    ...AuthForgotPasswordRoute.Route
+  }
+);
+export const AuthResetPassword = makeRoute(
+  "/(auth)/reset-password",
+  {
+    ...defaultInfo,
+    ...AuthResetPasswordRoute.Route
+  }
+);
+export const AuthSignIn = makeRoute(
+  "/(auth)/sign-in",
+  {
+    ...defaultInfo,
+    ...AuthSignInRoute.Route
+  }
+);
+export const AuthSignUp = makeRoute(
+  "/(auth)/sign-up",
+  {
+    ...defaultInfo,
+    ...AuthSignUpRoute.Route
+  }
+);
+export const DashboardAdmin = makeRoute(
+  "/(dashboard)/admin",
+  {
+    ...defaultInfo,
+    ...DashboardAdminRoute.Route
+  }
+);
+export const DashboardUser = makeRoute(
+  "/(dashboard)/user",
+  {
+    ...defaultInfo,
+    ...DashboardUserRoute.Route
+  }
+);
+export const Bookings = makeRoute(
+  "/bookings",
+  {
+    ...defaultInfo,
+    ...BookingsRoute.Route
+  }
+);
+export const CreateBooking = makeRoute(
+  "/bookings/create",
+  {
+    ...defaultInfo,
+    ...CreateBookingRoute.Route
+  }
+);
+export const Guests = makeRoute(
+  "/guests",
+  {
+    ...defaultInfo,
+    ...GuestsRoute.Route
+  }
+);
+export const CreateGuest = makeRoute(
+  "/guests/create",
+  {
+    ...defaultInfo,
+    ...CreateGuestRoute.Route
+  }
+);
+export const Properties = makeRoute(
+  "/properties",
+  {
+    ...defaultInfo,
+    ...PropertiesRoute.Route
+  }
+);
+export const PropertyDetail = makeRoute(
+  "/properties/[propertyId]",
+  {
+    ...defaultInfo,
+    ...PropertyDetailRoute.Route
+  }
+);
+export const CreateProperty = makeRoute(
+  "/properties/create",
+  {
+    ...defaultInfo,
+    ...CreatePropertyRoute.Route
+  }
+);
+

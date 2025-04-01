@@ -4,6 +4,7 @@ import type {
   Guest,
   GuestDocument,
   CreateBookingGuestParams,
+  GuestListItem,
 } from "./types";
 
 export const guestQueries = {
@@ -81,5 +82,142 @@ export const guestQueries = {
       return bookingGuest;
     }
     throw new Error("Failed to link guest to booking");
+  },
+
+  async listGuests(userId: string): Promise<GuestListItem[]> {
+    const result = db.query<GuestListItem>`
+      WITH RECURSIVE member_hierarchy AS (
+        -- Base case: Get all group leaders and family heads
+        SELECT 
+          g.id,
+          g.first_name,
+          g.last_name,
+          bg.guest_type,
+          bg.check_in,
+          bg.check_out,
+          bg.booking_id,
+          gd.document_type,
+          gd.document_number,
+          gd.document_issue_country,
+          p.id as property_id,
+          p.name as property_name,
+          a.id as apartment_id,
+          a.name as apartment_name,
+          COALESCE(
+            CASE 
+              WHEN aws.status IS NOT NULL THEN aws.status
+              ELSE 'pending'
+            END,
+            'pending'
+          ) as alloggiati_status,
+          NULL::uuid as parent_id
+        FROM guests g
+        JOIN booking_guests bg ON g.id = bg.guest_id
+        JOIN bookings b ON bg.booking_id = b.id
+        JOIN apartments a ON b.apartment_id = a.id
+        JOIN properties p ON a.property_id = p.id
+        LEFT JOIN guest_documents gd ON g.id = gd.guest_id
+        LEFT JOIN alloggiati_submissions aws ON bg.alloggiati_submission_id = aws.id
+        WHERE bg.guest_type IN ('group_leader', 'family_head', 'single_guest')
+        AND p.user_id = ${userId}
+
+        UNION ALL
+
+        -- Recursive case: Get all members
+        SELECT 
+          g.id,
+          g.first_name,
+          g.last_name,
+          bg.guest_type,
+          bg.check_in,
+          bg.check_out,
+          bg.booking_id,
+          gd.document_type,
+          gd.document_number,
+          gd.document_issue_country,
+          p.id,
+          p.name,
+          a.id,
+          a.name,
+          COALESCE(
+            CASE 
+              WHEN aws.status IS NOT NULL THEN aws.status
+              ELSE 'pending'
+            END,
+            'pending'
+          ),
+          CASE 
+            WHEN bg.guest_type = 'family_member' THEN (
+              SELECT guest_id 
+              FROM booking_guests 
+              WHERE booking_id = bg.booking_id 
+              AND guest_type = 'family_head'
+              LIMIT 1
+            )
+            WHEN bg.guest_type = 'group_member' THEN (
+              SELECT guest_id 
+              FROM booking_guests 
+              WHERE booking_id = bg.booking_id 
+              AND guest_type = 'group_leader'
+              LIMIT 1
+            )
+          END
+        FROM guests g
+        JOIN booking_guests bg ON g.id = bg.guest_id
+        JOIN bookings b ON bg.booking_id = b.id
+        JOIN apartments a ON b.apartment_id = a.id
+        JOIN properties p ON a.property_id = p.id
+        LEFT JOIN guest_documents gd ON g.id = gd.guest_id
+        LEFT JOIN alloggiati_submissions aws ON bg.alloggiati_submission_id = aws.id
+        WHERE bg.guest_type IN ('family_member', 'group_member')
+        AND p.user_id = ${userId}
+      )
+      SELECT 
+        id,
+        first_name as "firstName",
+        last_name as "lastName",
+        guest_type as "guestType",
+        check_in as "checkIn",
+        check_out as "checkOut",
+        booking_id as "bookingId",
+        json_build_object(
+          'documentType', document_type,
+          'documentNumber', document_number,
+          'documentIssueCountry', document_issue_country
+        ) as document,
+        json_build_object(
+          'id', property_id,
+          'name', property_name,
+          'apartment', json_build_object(
+            'id', apartment_id,
+            'name', apartment_name
+          )
+        ) as property,
+        alloggiati_status as "alloggiatiStatus",
+        parent_id
+      FROM member_hierarchy
+      ORDER BY booking_id, parent_id NULLS FIRST, guest_type
+    `;
+
+    const guests: GuestListItem[] = [];
+    const guestMap = new Map<string, GuestListItem>();
+
+    for await (const row of result) {
+      const guest = { ...row, members: [] };
+
+      if (row.parent_id) {
+        // This is a member, add it to the parent's members array
+        const parent = guestMap.get(row.parent_id);
+        if (parent) {
+          parent.members?.push(guest);
+        }
+      } else {
+        // This is a main guest
+        guestMap.set(row.id, guest);
+        guests.push(guest);
+      }
+    }
+
+    return guests;
   },
 };

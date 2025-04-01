@@ -102,11 +102,6 @@ export default function CreateGuestPage() {
   const bookingId = searchParams.get("bookingId");
 
   // Validate that we have the required booking information
-  if (!checkIn || !checkOut || !bookingId) {
-    toast.error("Missing booking information");
-    router.back();
-    return null;
-  }
 
   const form = useForm<CreateGuestForm>({
     resolver: zodResolver(guestSchema),
@@ -124,6 +119,12 @@ export default function CreateGuestPage() {
     control: form.control,
     name: "members",
   });
+
+  if (!checkIn || !checkOut || !bookingId) {
+    toast.error("Missing booking information");
+    router.back();
+    return null;
+  }
 
   const watchGuestType = form.watch("guestType");
   const isGroupOrFamily =
@@ -395,22 +396,7 @@ export default function CreateGuestPage() {
                         <SelectContent>
                           <SelectItem value="passport">Passaporto</SelectItem>
                           <SelectItem value="id_card">
-                            Carta d'identità
-                          </SelectItem>
-                          <SelectItem value="residence_permit">
-                            Permesso di soggiorno
-                          </SelectItem>
-                          <SelectItem value="driving_license">
-                            Patente di guida (solo cittadini italiani)
-                          </SelectItem>
-                          <SelectItem value="firearms_license">
-                            Porto d'armi (solo cittadini italiani)
-                          </SelectItem>
-                          <SelectItem value="nautical_license">
-                            Patente nautica (solo cittadini italiani)
-                          </SelectItem>
-                          <SelectItem value="diplomatic_id">
-                            Tessera diplomatica
+                            Carta d&apos;identità
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -644,3 +630,4 @@ export default function CreateGuestPage() {
     </div>
   );
 }
+

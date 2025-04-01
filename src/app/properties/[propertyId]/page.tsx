@@ -19,24 +19,6 @@ import { Encore } from "@/lib/utils";
 import { useParams, usePush } from "@/routes/hooks";
 import { PropertyDetail } from "@/routes";
 
-// Mock data structure
-interface Apartment {
-  id: string;
-  name: string;
-  maxGuests: number;
-  bedrooms: number;
-  bathrooms: number;
-  bookings: Array<{ id: string }>;
-}
-
-interface PropertyData {
-  id: string;
-  name: string;
-  address: string;
-  has_sciaa_license: boolean;
-  apartments: Apartment[];
-}
-
 export default function PropertyPage() {
   const params = useParams(PropertyDetail);
   const push = usePush(Properties);

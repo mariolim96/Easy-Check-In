@@ -80,9 +80,9 @@ function Calendar({
     }, [yearRange]),
   );
 
-  const { onNextClick, onPrevClick, startMonth, endMonth } = props;
+  const { startMonth, endMonth } = props;
 
-  const columnsDisplayed = navView === "years" ? 1 : numberOfMonths;
+  const columnsDisplayed = numberOfMonths ?? 1;
 
   const _monthsClassName = cn("relative flex", props.monthsClassName);
   const _monthCaptionClassName = cn(
@@ -169,7 +169,7 @@ function Calendar({
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       style={{
-        width: 248.8 * (columnsDisplayed ?? 1) + "px",
+        width: `${248.8 * columnsDisplayed}px`,
       }}
       classNames={{
         months: _monthsClassName,

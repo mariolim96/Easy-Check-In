@@ -6,6 +6,8 @@ export const Route = {
   search: z.object({
     guestCount: z.number().optional(),
     bookingId: z.string().optional(),
+    checkIn: z.string().optional(),
+    checkOut: z.string().optional(),
   }),
   description: "Create a new guest record",
 };

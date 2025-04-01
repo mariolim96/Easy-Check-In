@@ -44,13 +44,7 @@ import {
 import { Encore } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { usePush } from "@/routes/hooks";
-import { Bookings, CreateBooking, CreateGuest } from "@/routes";
-import { string } from "zod";
-import {
-  Booking,
-  ListBookingsParams,
-} from "../../../server/api/bookings/types";
+import { CreateBooking, CreateGuest } from "@/routes";
 
 const BOOKING_STATUSES = {
   PENDING: "pending",
