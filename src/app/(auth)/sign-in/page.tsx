@@ -41,30 +41,51 @@ export default function SignIn() {
   const handleCredentialsSignIn = async (
     values: z.infer<typeof signInSchema>,
   ) => {
-    await signIn.email(
-      {
+    try {
+      console.log("Attempting sign in with:", {
         email: values.email,
-        password: values.password,
-      },
-      {
-        onRequest: () => {
-          setPendingCredentials(true);
+        baseUrl: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
+      });
+
+      await signIn.email(
+        {
+          email: values.email,
+          password: values.password,
         },
-        onSuccess: async (response) => {
-          router.push(Home());
-          router.refresh();
-          toast.success("Successfully signed in!", {
-            description: "You have successfully signed in!",
-          });
+        {
+          onRequest: () => {
+            setPendingCredentials(true);
+            console.log("Sign in request started");
+          },
+          onSuccess: async (response) => {
+            console.log("Sign in successful:", response);
+            router.push(Home());
+            router.refresh();
+            toast.success("Successfully signed in!", {
+              description: "You have successfully signed in!",
+            });
+          },
+          onError: (context: ErrorContext): void | Promise<void> => {
+            console.error("Sign in error:", {
+              error: context.error,
+              status: context.response?.status,
+              statusText: context.response?.statusText,
+            });
+
+            toast.error("Sign in failed", {
+              description: `Error: ${context.error.message ?? "Unknown error"}. Status: ${context.response?.status}`,
+            });
+          },
         },
-        onError: (context: ErrorContext): void | Promise<void> => {
-          toast.error("Something went wrong!", {
-            description: context.error.message ?? "Something went wrong.",
-          });
-        },
-      },
-    );
-    setPendingCredentials(false);
+      );
+    } catch (error) {
+      console.error("Unexpected error during sign in:", error);
+      toast.error("Sign in failed", {
+        description: "An unexpected error occurred",
+      });
+    } finally {
+      setPendingCredentials(false);
+    }
   };
 
   const handleSignInWithGithub = async () => {
@@ -82,7 +103,7 @@ export default function SignIn() {
         },
         onError: (ctx: ErrorContext) => {
           toast.error("Something went wrong!", {
-            description: ctx.error.message ?? "Something went wrong.",
+            description: JSON.stringify(ctx.error),
           });
         },
       },
@@ -133,11 +154,7 @@ export default function SignIn() {
             </form>
           </Form>
           <div className="mt-4">
-            <Button
-              className="w-full"
-              //   pending={pendingGithub}
-              onClick={handleSignInWithGithub}
-            >
+            <Button className="w-full" onClick={handleSignInWithGithub}>
               <SiGithub className="mr-2 h-4 w-4" />
               Continue with GitHub
             </Button>

@@ -36,6 +36,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import React from "react";
 
 export interface Guest {
   id: string;
@@ -195,8 +196,8 @@ export function PendingTab({
                 </TableHeader>
                 <TableBody>
                   {guests.map((guest) => (
-                    <>
-                      <TableRow key={guest.id} className="border-b bg-card">
+                    <React.Fragment key={guest.id}>
+                      <TableRow className="border-b bg-card">
                         <TableCell>
                           {hasMembers(guest) && (
                             <Button
@@ -290,7 +291,7 @@ export function PendingTab({
                             </TableCell>
                           </TableRow>
                         ))}
-                    </>
+                    </React.Fragment>
                   ))}
                 </TableBody>
               </Table>

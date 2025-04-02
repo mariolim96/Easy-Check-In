@@ -29,6 +29,23 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Encore } from "@/lib/utils";
 import { DateInputPicker } from "@/components/ui/date-input-picker";
+import { SelectSearch } from "@/components/ui/select-search";
+import { STATI } from "@/constants/stati";
+import { COMUNI } from "@/constants/comuni";
+
+// Transform STATI and COMUNI for SelectSearch options
+const countryOptions = STATI.map((stato) => ({
+  value: stato.Codice.toString(),
+  label: stato.Descrizione,
+}));
+
+const comuneOptions = COMUNI.map((comune) => ({
+  value: comune.Codice.toString(),
+  label: comune.Descrizione,
+}));
+
+// Combine both options with a separator
+const documentIssuePlaceOptions = comuneOptions.concat(countryOptions);
 
 const memberSchema = z.object({
   arrivalDate: z.date({
@@ -194,6 +211,15 @@ function CreateGuestForm() {
     }
   };
 
+  // Add this handler for text inputs
+  const handleUppercaseInput = (
+    field: any,
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const upperValue = event.target.value.toUpperCase();
+    field.onChange(upperValue);
+  };
+
   return (
     <div className="container mx-auto py-8">
       <Card className="mx-auto max-w-2xl">
@@ -230,7 +256,10 @@ function CreateGuestForm() {
                     <FormItem>
                       <FormLabel>First Name</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input
+                          {...field}
+                          onChange={(e) => handleUppercaseInput(field, e)}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -244,7 +273,10 @@ function CreateGuestForm() {
                     <FormItem>
                       <FormLabel>Last Name</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input
+                          {...field}
+                          onChange={(e) => handleUppercaseInput(field, e)}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -330,7 +362,13 @@ function CreateGuestForm() {
                     <FormItem>
                       <FormLabel>Citizenship</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <SelectSearch
+                          options={countryOptions}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select citizenship"
+                          searchPlaceholder="Search countries..."
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -344,7 +382,13 @@ function CreateGuestForm() {
                     <FormItem>
                       <FormLabel>Place of Birth</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <SelectSearch
+                          options={countryOptions}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select place of birth"
+                          searchPlaceholder="Search countries..."
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -371,7 +415,14 @@ function CreateGuestForm() {
                     <FormItem>
                       <FormLabel>Document Issue Place</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <SelectSearch
+                          options={documentIssuePlaceOptions}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select document issue place"
+                          searchPlaceholder="Search places..."
+                          emptyMessage="No places found"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -412,7 +463,10 @@ function CreateGuestForm() {
                     <FormItem>
                       <FormLabel>Document Number</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input
+                          {...field}
+                          onChange={(e) => handleUppercaseInput(field, e)}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -485,7 +539,12 @@ function CreateGuestForm() {
                               <FormItem>
                                 <FormLabel>First Name</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <Input
+                                    {...field}
+                                    onChange={(e) =>
+                                      handleUppercaseInput(field, e)
+                                    }
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -499,7 +558,12 @@ function CreateGuestForm() {
                               <FormItem>
                                 <FormLabel>Last Name</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <Input
+                                    {...field}
+                                    onChange={(e) =>
+                                      handleUppercaseInput(field, e)
+                                    }
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -562,7 +626,13 @@ function CreateGuestForm() {
                               <FormItem>
                                 <FormLabel>Place of Birth</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <SelectSearch
+                                    options={countryOptions}
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    placeholder="Select place of birth"
+                                    searchPlaceholder="Search countries..."
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -576,7 +646,13 @@ function CreateGuestForm() {
                               <FormItem>
                                 <FormLabel>Citizenship</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <SelectSearch
+                                    options={countryOptions}
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    placeholder="Select citizenship"
+                                    searchPlaceholder="Search countries..."
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>

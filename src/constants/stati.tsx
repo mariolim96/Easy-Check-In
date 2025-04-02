@@ -1416,3 +1416,7 @@ export const STATI = [
     DataFineVal: "",
   },
 ];
+
+export const STATI_MAP = new Map(
+  STATI.map((stato) => [stato.Codice, stato.Descrizione]),
+);

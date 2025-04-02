@@ -8,10 +8,10 @@ function cn(...inputs: ClassValue[]) {
 
 const Encore = new Client(Local, {
   requestInit: {
-    credentials: "include", // This enables sending cookies
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      cookie: typeof window !== "undefined" ? document.cookie : "",
+      "Access-Control-Allow-Credentials": "true",
     },
   },
 });

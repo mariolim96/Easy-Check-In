@@ -1,22 +1,7 @@
-export const TIPO_ALLOGGIATO = [
-  {
-    Codice: 16,
-    Descrizione: "OSPITE SINGOLO",
-  },
-  {
-    Codice: 17,
-    Descrizione: "CAPO FAMIGLIA",
-  },
-  {
-    Codice: 18,
-    Descrizione: "CAPO GRUPPO",
-  },
-  {
-    Codice: 19,
-    Descrizione: "FAMILIARE",
-  },
-  {
-    Codice: 20,
-    Descrizione: "MEMBRO GRUPPO",
-  },
-];
+export const TIPO_ALLOGGIATO = new Map([
+  [16, "single_guest"],
+  [17, "family_head"],
+  [18, "group_leader"],
+  [19, "family_member"],
+  [20, "group_member"],
+]);

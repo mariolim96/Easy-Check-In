@@ -70,6 +70,9 @@ export const auth = betterAuth({
     "http://localhost:4000",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:4000",
+    "http://192.168.1.49:3000", // Add your local IP
+    "http://192.168.1.49:4000", // Add your local IP
+    "*",
   ],
   advanced: {
     defaultCookieAttributes: {

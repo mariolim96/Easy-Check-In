@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/popover";
 import { Check, ChevronDown } from "lucide-react";
 import { useId, useState } from "react";
+import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 
 export interface SelectOption {
   value: string;
@@ -50,9 +51,36 @@ export function SelectSearch({
   const id = useId();
   const [open, setOpen] = useState<boolean>(false);
   const [internalValue, setInternalValue] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const value = controlledValue ?? internalValue;
   const handleValueChange = onChange ?? setInternalValue;
+
+  const filteredOptions = options.filter((option) =>
+    option.label.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  const Row = ({ index, style }: ListChildComponentProps) => {
+    const option = filteredOptions[index];
+    return (
+      <CommandItem
+        key={option.value}
+        value={option.value}
+        onSelect={(currentValue) => {
+          handleValueChange(currentValue === value ? "" : currentValue);
+          setOpen(false);
+          setSearchQuery("");
+        }}
+        className="cursor-pointer"
+        style={style}
+      >
+        {option.label}
+        {value === option.value && (
+          <Check size={16} strokeWidth={2} className="ml-auto" />
+        )}
+      </CommandItem>
+    );
+  };
 
   return (
     <div className={cn("space-y-2", className)}>
@@ -84,29 +112,28 @@ export function SelectSearch({
           className="w-full min-w-[var(--radix-popper-anchor-width)] border-input p-0"
           align="start"
         >
-          <Command>
-            <CommandInput placeholder={searchPlaceholder} />
-            <CommandList>
-              <CommandEmpty>{emptyMessage}</CommandEmpty>
-              <CommandGroup>
-                {options.map((option) => (
-                  <CommandItem
-                    key={option.value}
-                    value={option.value}
-                    onSelect={(currentValue: string) => {
-                      handleValueChange(
-                        currentValue === value ? "" : currentValue,
-                      );
-                      setOpen(false);
-                    }}
+          <Command shouldFilter={false}>
+            <CommandInput
+              placeholder={searchPlaceholder}
+              value={searchQuery}
+              onValueChange={setSearchQuery}
+            />
+            <CommandList className="overflow-hidden p-0">
+              {filteredOptions.length === 0 ? (
+                <CommandEmpty>{emptyMessage}</CommandEmpty>
+              ) : (
+                <CommandGroup className="overflow-hidden p-0">
+                  <List
+                    height={Math.min(300, filteredOptions.length * 35)}
+                    itemCount={filteredOptions.length}
+                    itemSize={35}
+                    width="100%"
+                    className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
                   >
-                    {option.label}
-                    {value === option.value && (
-                      <Check size={16} strokeWidth={2} className="ml-auto" />
-                    )}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+                    {Row}
+                  </List>
+                </CommandGroup>
+              )}
             </CommandList>
           </Command>
         </PopoverContent>
