@@ -67,7 +67,7 @@ export function ReceiptsTab({ submittedGuests, isLoading }: ReceiptsTabProps) {
                       <p className="text-sm text-muted-foreground">
                         Submitted on{" "}
                         {format(
-                          new Date(guest.submittedAt || new Date()),
+                          new Date(guest.submittedAt ?? new Date()),
                           "MMM d, yyyy",
                         )}
                       </p>

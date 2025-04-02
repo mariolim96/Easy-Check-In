@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,6 +17,7 @@ import {
 import { SubmittedTab } from "@/components/guests/SubmittedTab";
 import { SettingsTab } from "@/components/guests/SettingsTab";
 import { ReceiptsTab } from "@/components/guests/ReceiptsTab";
+import { useQuery } from '@tanstack/react-query';
 
 // Types based on your API
 interface Guest {
@@ -70,7 +71,6 @@ const mockGuests: Guest[] = [
       },
     },
     alloggiatiStatus: "submitted",
-    documentScanUrl: "https://example.com/scan1.pdf",
     members: [],
   },
   {
@@ -433,37 +433,31 @@ const mockGuests: Guest[] = [
 ];
 
 const GuestsPage = () => {
-  const [guests, setGuests] = useState<Guest[]>([]);
   const [selectedTab, setSelectedTab] = useState("pending");
-  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
-  //   const isMobile = useIsMobile();
 
-  useEffect(() => {
-    const fetchGuests = async () => {
+  const { data: guests = [], isLoading } = useQuery({
+    queryKey: ['guests'],
+    queryFn: async () => {
       try {
         // For development, use mock data
         // In production, uncomment the API call
-        // const response = await Encore.guests.listGuests();
-        // setGuests(response);
-        setGuests(mockGuests);
+        // return await Encore.guests.listGuests();
+        return mockGuests;
       } catch (error) {
         toast({
           title: "Error",
           description: "Failed to fetch guests",
           variant: "destructive",
         });
-      } finally {
-        setIsLoading(false);
+        throw error;
       }
-    };
-
-    fetchGuests();
-  }, [toast]);
+    }
+  });
 
   const pendingGuests = guests.filter((g) => g.alloggiatiStatus === "pending");
   const submittedGuests = guests.filter(
-    (g) => g.alloggiatiStatus === "submitted",
+    (g) => g.alloggiatiStatus === "submitted"
   );
 
   return (
@@ -520,3 +514,4 @@ const GuestsPage = () => {
 };
 
 export default GuestsPage;
+

@@ -129,7 +129,7 @@ export default function SignIn() {
                   )}
                 />
               ))}
-              <Button pending={pendingCredentials} className="w-full">
+              <Button className="w-full">
                 Sign in
               </Button>
             </form>
@@ -137,7 +137,7 @@ export default function SignIn() {
           <div className="mt-4">
             <Button
               className="w-full"
-              // pending={pendingGithub}
+            //   pending={pendingGithub}
               onClick={handleSignInWithGithub}
             >
               <SiGithub className="mr-2 h-4 w-4" />

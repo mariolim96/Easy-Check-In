@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
@@ -18,7 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bookings } from "@/routes";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/custom/datePicker";
-import { bookings } from "@/lib/encore-client";
+import type { bookings } from "@/lib/encore-client";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface BookingFormData {
@@ -62,6 +62,7 @@ export default function CreateBookingPage() {
       formData.checkIn,
       formData.checkOut,
       formData.guestCount,
+      searchSubmitted,
     ],
     queryFn: async () => {
       if (!searchSubmitted) return { properties: [] };
@@ -86,24 +87,29 @@ export default function CreateBookingPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Add this effect to automatically search when all required fields are filled
-  useEffect(() => {
-    const canSearch =
-      formData.checkIn && formData.checkOut && formData.guestCount >= 1;
-    if (canSearch) {
-      handleSearch();
-    }
-  }, [formData.checkIn, formData.checkOut, formData.guestCount]);
-
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     if (!validateSearch()) {
       setSearchSubmitted(false);
       return;
     }
 
     setSearchSubmitted(true);
-    await refetchProperties();
-  };
+    try {
+      await refetchProperties();
+    } catch (error) {
+      console.error('Failed to fetch properties:', error);
+      toast.error('Failed to fetch available properties');
+    }
+  }, [refetchProperties, validateSearch]);
+
+  // Add this effect to automatically search when all required fields are filled
+  useEffect(() => {
+    const canSearch =
+      formData.checkIn && formData.checkOut && formData.guestCount >= 1;
+    if (canSearch) {
+      void handleSearch();
+    }
+  }, [formData.checkIn, formData.checkOut, formData.guestCount, handleSearch]);
 
   const handleInputChange = (field: keyof BookingFormData, value: unknown) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -437,3 +443,4 @@ export default function CreateBookingPage() {
     </Card>
   );
 }
+

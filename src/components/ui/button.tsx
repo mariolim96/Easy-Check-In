@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-
 import { cn } from "@/lib/utils";
+import { WaveEffect } from "./wave-effect";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
@@ -31,27 +31,68 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  },
+  }
 );
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  waveColor?: string;
+  waveDuration?: number;
+  disableWaveEffect?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ 
+    className, 
+    variant, 
+    size, 
+    asChild = false, 
+    waveColor,
+    waveDuration,
+    disableWaveEffect = false,
+    ...props 
+  }, ref) => {
     const Comp = asChild ? Slot : "button";
-    return (
+    
+    const buttonContent = (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
       />
     );
-  },
+
+    if (disableWaveEffect) {
+      return buttonContent;
+    }
+
+    // Define wave colors based on variant
+    const defaultWaveColors = {
+      default: "bg-white/30",
+      destructive: "bg-white/30",
+      outline: "bg-black/30",
+      secondary: "bg-white/30",
+      ghost: "bg-black/30",
+      link: "bg-black/30",
+    };
+
+    const effectColor = waveColor ?? defaultWaveColors[variant!] ?? "bg-black/30";
+
+    return (
+      <WaveEffect 
+        color={effectColor}
+        duration={waveDuration}
+        className="inline-flex"
+      >
+        {buttonContent}
+      </WaveEffect>
+    );
+  }
 );
 Button.displayName = "Button";
 
 export { Button, buttonVariants };
+
+

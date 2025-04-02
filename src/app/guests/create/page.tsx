@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -91,7 +91,7 @@ const guestSchema = z.object({
 
 type CreateGuestForm = z.infer<typeof guestSchema>;
 
-export default function CreateGuestPage() {
+function CreateGuestForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, setIsPending] = useState(false);
@@ -630,4 +630,13 @@ export default function CreateGuestPage() {
     </div>
   );
 }
+
+export default function CreateGuestPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CreateGuestForm />
+    </Suspense>
+  );
+}
+
 
