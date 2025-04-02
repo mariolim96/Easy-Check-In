@@ -31,7 +31,7 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
+  },
 );
 
 export interface ButtonProps
@@ -44,18 +44,21 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ 
-    className, 
-    variant, 
-    size, 
-    asChild = false, 
-    waveColor,
-    waveDuration,
-    disableWaveEffect = false,
-    ...props 
-  }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      waveColor,
+      waveDuration,
+      disableWaveEffect = false,
+      ...props
+    },
+    ref,
+  ) => {
     const Comp = asChild ? Slot : "button";
-    
+
     const buttonContent = (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
@@ -78,10 +81,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       link: "bg-black/30",
     };
 
-    const effectColor = waveColor ?? defaultWaveColors[variant!] ?? "bg-black/30";
+    const effectColor =
+      waveColor ?? defaultWaveColors[variant!] ?? "bg-black/30";
 
     return (
-      <WaveEffect 
+      <WaveEffect
         color={effectColor}
         duration={waveDuration}
         className="inline-flex"
@@ -89,10 +93,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {buttonContent}
       </WaveEffect>
     );
-  }
+  },
 );
 Button.displayName = "Button";
 
 export { Button, buttonVariants };
-
-

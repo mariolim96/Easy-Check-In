@@ -129,15 +129,13 @@ export default function SignIn() {
                   )}
                 />
               ))}
-              <Button className="w-full">
-                Sign in
-              </Button>
+              <Button className="w-full">Sign in</Button>
             </form>
           </Form>
           <div className="mt-4">
             <Button
               className="w-full"
-            //   pending={pendingGithub}
+              //   pending={pendingGithub}
               onClick={handleSignInWithGithub}
             >
               <SiGithub className="mr-2 h-4 w-4" />

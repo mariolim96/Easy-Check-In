@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 // Import the typed routes
 import { Home as HomeRoute, Properties, Bookings, Guests } from "@/routes";
 import type { RouteBuilder } from "@/routes/makeRoute";
@@ -35,25 +36,29 @@ export const SidebarLink = ({
   open: boolean;
   className?: string;
 }) => {
+  const pathname = usePathname();
+  const isActive = pathname === link.route();
+
   return (
-    // Use the typed Link component from the route
-    <link.route.Link className={cn("", className)}>
-      <Button
-        variant="ghost"
-        className="group/sidebar m-0 flex w-full items-center justify-start gap-2 p-0 py-2"
-        // onClick={() => setActiveTab(link.label)}
+    <link.route.Link
+      className={cn(
+        "group flex items-center rounded-md px-[0.8rem] py-3 text-sm font-medium transition-all",
+        isActive
+          ? "bg-primary text-primary-foreground"
+          : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+        className,
+      )}
+    >
+      <span className="min-w-[24px]">{link.icon}</span>
+      <motion.span
+        animate={{
+          width: open ? "auto" : 0,
+          opacity: open ? 1 : 0,
+        }}
+        className="ml-3 overflow-hidden whitespace-pre"
       >
-        {link.icon}
-        <motion.span
-          animate={{
-            display: open ? "inline-block" : "none",
-            opacity: open ? 1 : 0,
-          }}
-          className="text-md !m-0 inline-block whitespace-pre !p-0 text-neutral-700 transition duration-150 dark:text-neutral-200"
-        >
-          {link.label}
-        </motion.span>
-      </Button>
+        {link.label}
+      </motion.span>
     </link.route.Link>
   );
 };
@@ -67,11 +72,11 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "hidden h-full w-[300px] flex-shrink-0 bg-neutral-100 px-4 py-4 dark:bg-neutral-800 md:flex md:flex-col",
+        "hidden h-full w-[220px] flex-shrink-0 bg-neutral-100 px-4 py-4 dark:bg-neutral-800 md:flex md:flex-col",
         className,
       )}
       animate={{
-        width: open ? "300px" : "60px",
+        width: open ? "220px" : "60px",
       }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
@@ -87,40 +92,41 @@ export default function Sidebar({ links }: SidebarProps) {
     {
       label: "Overview",
       route: HomeRoute,
-      icon: <Home className="mr-2 !size-6" />,
+      icon: <Home className="size-5" />,
     },
     {
       label: "Properties",
       route: Properties,
-      icon: <Building2 className="mr-2 !size-6" />,
+      icon: <Building2 className="size-5" />,
     },
     {
       label: "Bookings",
       route: Bookings,
-      icon: <Calendar className="mr-2 !size-6" />,
+      icon: <Calendar className="size-5" />,
     },
     {
       label: "Guests",
       route: Guests,
-      icon: <Users className="mr-2 !size-6" />,
+      icon: <Users className="size-5" />,
     },
   ];
   const [open, setOpen] = useState(false);
+
   return (
     <motion.div
-      className="hidden w-[300px] flex-col border-r bg-card md:flex"
+      className="hidden w-[220px] flex-col border-r bg-card md:flex"
       initial={{ width: 0 }}
       exit={{ width: 0 }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       animate={{
-        width: open ? "300px" : "60px",
+        width: open ? "220px" : "60px",
       }}
     >
       <div className="pl-2">
         <Logo open={open} />
       </div>
-      <nav className="flex-1 px-4 py-2">
+      <nav className="flex-1 space-y-1 overflow-y-auto pl-1 pr-2">
         {currentLinks.map((link) => (
           <SidebarLink key={link.label} link={link} open={open} />
         ))}

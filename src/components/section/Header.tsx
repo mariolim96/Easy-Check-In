@@ -11,69 +11,86 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { signOut, useSession } from "@/lib/auth-client";
 import { AuthSignIn, AuthSignUp, DashboardAdmin, Home } from "@/routes";
-import Logo from "../custom/logo";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
+import { ThemeSwitcher } from "../ui/theme-switcher";
+import { ChevronDown } from "lucide-react";
 
 export default function Header() {
   const router = useRouter();
   const { data: session } = useSession();
+
   return (
-    <div className="sticky top-0 z-50 bg-white/75 shadow backdrop-blur">
-      <div className="container mx-auto flex h-12 items-center justify-between">
-        <Home.Link>
-          <Logo className="h-full w-auto py-3" />
-        </Home.Link>
-        <div className="flex items-center space-x-3">
+    <div className="sticky top-0 z-50 backdrop-blur">
+      <div className="container ml-auto mr-6 flex h-14 max-w-screen-2xl items-center justify-end">
+        <div className="flex items-center gap-2">
+          <ThemeSwitcher />
+
           {session ? (
-            <>
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Avatar>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative">
+                  <Avatar className="h-8 w-8 rounded-full">
                     <AvatarImage src="/images/77627641.jpg" alt="@shadcn" />
-                    <AvatarFallback>Its-Satyajit</AvatarFallback>
+                    <AvatarFallback>SC</AvatarFallback>
                   </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>{session.user.name}</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer">
-                    <DashboardAdmin.Link>DashBoard</DashboardAdmin.Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() =>
-                      signOut({
-                        fetchOptions: {
-                          onSuccess: () => {
-                            document.cookie.split(";").forEach((c) => {
-                              document.cookie = c
-                                .replace(/^ +/, "")
-                                .replace(
-                                  /=.*/,
-                                  "=;expires=" +
-                                    new Date().toUTCString() +
-                                    ";path=/",
-                                );
-                            });
-                            router.push(Home());
-                          },
+                  <ChevronDown
+                    size={16}
+                    strokeWidth={2}
+                    className="ms-2 opacity-60"
+                    aria-hidden="true"
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {session.user.name}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {session.user.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <DashboardAdmin.Link>Dashboard</DashboardAdmin.Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    signOut({
+                      fetchOptions: {
+                        onSuccess: () => {
+                          document.cookie.split(";").forEach((c) => {
+                            document.cookie = c
+                              .replace(/^ +/, "")
+                              .replace(
+                                /=.*/,
+                                "=;expires=" +
+                                  new Date().toUTCString() +
+                                  ";path=/",
+                              );
+                          });
+                          router.push(Home());
                         },
-                      })
-                    }
-                  >
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
+                      },
+                    })
+                  }
+                >
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <>
               <AuthSignIn.Link>
-                <Button variant={"destructive"}>Sign In</Button>
+                <Button variant="ghost" size="sm">
+                  Sign in
+                </Button>
               </AuthSignIn.Link>
               <AuthSignUp.Link>
-                <Button variant={"default"}>Sign Up</Button>
+                <Button size="sm">Sign up</Button>
               </AuthSignUp.Link>
             </>
           )}

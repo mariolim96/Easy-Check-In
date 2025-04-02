@@ -17,7 +17,7 @@ import {
 import { SubmittedTab } from "@/components/guests/SubmittedTab";
 import { SettingsTab } from "@/components/guests/SettingsTab";
 import { ReceiptsTab } from "@/components/guests/ReceiptsTab";
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 
 // Types based on your API
 interface Guest {
@@ -437,7 +437,7 @@ const GuestsPage = () => {
   const { toast } = useToast();
 
   const { data: guests = [], isLoading } = useQuery({
-    queryKey: ['guests'],
+    queryKey: ["guests"],
     queryFn: async () => {
       try {
         // For development, use mock data
@@ -452,12 +452,12 @@ const GuestsPage = () => {
         });
         throw error;
       }
-    }
+    },
   });
 
   const pendingGuests = guests.filter((g) => g.alloggiatiStatus === "pending");
   const submittedGuests = guests.filter(
-    (g) => g.alloggiatiStatus === "submitted"
+    (g) => g.alloggiatiStatus === "submitted",
   );
 
   return (
@@ -514,4 +514,3 @@ const GuestsPage = () => {
 };
 
 export default GuestsPage;
-

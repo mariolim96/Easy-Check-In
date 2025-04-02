@@ -1,13 +1,12 @@
 import "@/styles/globals.css";
-
 import type { Metadata } from "next";
-
 import ReactQueryProvider from "@/components/providers/ReactQuery";
 import { Toaster } from "@/components/ui/sonner";
 import env from "@/env";
 import { R, RI } from "@/styles/Fonts";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { DashboardLayout as Layout } from "@/components/templates/Layout";
+import { ThemeProvider } from "@/components/providers/themeProvider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -20,15 +19,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${R.variable} ${RI.variable} scroll-smooth font-raleway antialiased`}
       >
-        <ReactQueryProvider>
-          <Layout>{children}</Layout>
-          {env.NODE_ENV === "development" ? <ReactQueryDevtools /> : null}
-          <Toaster />
-        </ReactQueryProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ReactQueryProvider>
+            <Layout>{children}</Layout>
+            {env.NODE_ENV === "development" ? <ReactQueryDevtools /> : null}
+            <Toaster />
+          </ReactQueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

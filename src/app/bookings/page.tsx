@@ -60,15 +60,15 @@ const BOOKING_SOURCES = {
   OTHER: "other",
 };
 
-const formatDate = (dateString: string | null | undefined) => {
-  if (!dateString) return "N/A";
-  try {
-    return format(new Date(dateString), "MMM d, yyyy");
-  } catch (error) {
-    console.error("Error formatting date:", dateString, error);
-    return "Invalid date";
-  }
-};
+// const formatDate = (dateString: string | null | undefined) => {
+//   if (!dateString) return "N/A";
+//   try {
+//     return format(new Date(dateString), "MMM d, yyyy");
+//   } catch (error) {
+//     console.error("Error formatting date:", dateString, error);
+//     return "Invalid date";
+//   }
+// };
 
 export default function BookingsPage() {
   // const router = useRouter(); // Removed
@@ -127,29 +127,29 @@ export default function BookingsPage() {
 
   const getStatusStyle = (status: string) => {
     const styles = {
-      [BOOKING_STATUSES.CONFIRMED]: "bg-green-100 text-green-700",
-      [BOOKING_STATUSES.CANCELLED]: "bg-red-100 text-red-700",
-      [BOOKING_STATUSES.COMPLETED]: "bg-blue-100 text-blue-700",
-      [BOOKING_STATUSES.PENDING]: "bg-yellow-100 text-yellow-700",
+      [BOOKING_STATUSES.CONFIRMED]: "bg-secondary/20 text-secondary",
+      [BOOKING_STATUSES.CANCELLED]: "bg-destructive/20 text-destructive",
+      [BOOKING_STATUSES.COMPLETED]: "bg-primary/20 text-primary",
+      [BOOKING_STATUSES.PENDING]: "bg-muted text-muted-foreground",
     };
-    return styles[status] || "bg-gray-100 text-gray-700";
+    return styles[status] || "bg-accent text-accent-foreground";
   };
 
   const getSourceStyle = (source: string) => {
     const styles = {
-      [BOOKING_SOURCES.DIRECT]: "bg-green-100 text-green-700",
-      [BOOKING_SOURCES.AIRBNB]: "bg-red-100 text-red-700",
-      [BOOKING_SOURCES.BOOKING]: "bg-blue-100 text-blue-700",
-      [BOOKING_SOURCES.OTHER]: "bg-gray-100 text-gray-700",
+      [BOOKING_SOURCES.DIRECT]: "bg-secondary/20 text-secondary",
+      [BOOKING_SOURCES.AIRBNB]: "bg-destructive/20 text-destructive",
+      [BOOKING_SOURCES.BOOKING]: "bg-primary/20 text-primary",
+      [BOOKING_SOURCES.OTHER]: "bg-muted text-muted-foreground",
     };
-    return styles[source] || "bg-gray-100 text-gray-700";
+    return styles[source] || "bg-accent text-accent-foreground";
   };
 
   return (
     <div className="animate-fade-in space-y-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="mb-2 text-3xl font-semibold tracking-tight">
+          <h1 className="mb-2 text-3xl font-semibold tracking-tight text-foreground">
             Bookings
           </h1>
           <p className="text-muted-foreground">
@@ -171,14 +171,14 @@ export default function BookingsPage() {
             placeholder="Search bookings..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-background pl-10 md:w-80"
+            className="w-full pl-10 md:w-80"
           />
           <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
         </div>
 
         <div className="flex flex-col gap-4 sm:flex-row">
           <Select value={filterApartment} onValueChange={setFilterApartment}>
-            <SelectTrigger className="w-40 border bg-background hover:bg-accent">
+            <SelectTrigger className="w-40">
               <Building2 className="mr-2 h-4 w-4" />
               <SelectValue placeholder="All Apartments" />
             </SelectTrigger>
@@ -195,7 +195,7 @@ export default function BookingsPage() {
           </Select>
 
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-40 border bg-background hover:bg-accent">
+            <SelectTrigger className="w-40">
               <Filter className="mr-2 h-4 w-4" />
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
@@ -209,7 +209,7 @@ export default function BookingsPage() {
             </SelectContent>
           </Select>
 
-          <Button variant="outline" onClick={toggleSortOrder}>
+          <Button variant="outline" onClick={toggleSortOrder} className="w-40">
             <CalendarDays className="mr-2 h-4 w-4" />
             Sort by Date
             <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -250,7 +250,12 @@ export default function BookingsPage() {
               filteredBookings.map((booking, id) => (
                 <TableRow
                   key={booking.id}
-                  className={`${id % 2 !== 0 ? "bg-primary-foreground/70" : "bg-primary-foreground"}`}
+                  className={cn(
+                    "transition-colors",
+                    id % 2 === 0
+                      ? "bg-card hover:bg-muted/50"
+                      : "bg-muted/30 hover:bg-muted/50",
+                  )}
                 >
                   <TableCell>{booking.apartment_name}</TableCell>
                   <TableCell>{booking.check_in}</TableCell>

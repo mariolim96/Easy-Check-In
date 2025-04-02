@@ -18,7 +18,10 @@ export function WaveEffect({
   duration = 0.6,
 }: WaveEffectProps) {
   const [keyValue, setKeyValue] = useState<number>(0);
-  const [ripple, setRipple] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [ripple, setRipple] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
   const [showRipple, setShowRipple] = useState<boolean>(false);
   const [mouseUp, setMouseUp] = useState<boolean>(false);
   const [animationComplete, setAnimationComplete] = useState<boolean>(false);
@@ -51,7 +54,7 @@ export function WaveEffect({
 
   return (
     <div
-      className={cn("inline-flex relative overflow-hidden", className)}
+      className={cn("relative inline-flex overflow-hidden", className)}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
     >
@@ -60,8 +63,8 @@ export function WaveEffect({
         <motion.span
           key={keyValue}
           className={cn(
-            "absolute aspect-square bg-black bg-opacity-30 rounded-full pointer-events-none start-0 top-0",
-            color
+            "pointer-events-none absolute start-0 top-0 aspect-square rounded-full bg-black bg-opacity-30",
+            color,
           )}
           initial={{ opacity: 1, scale: 0.5 }}
           animate={{ opacity: 1, scale: 3.5 }}

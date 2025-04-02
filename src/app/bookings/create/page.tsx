@@ -97,8 +97,8 @@ export default function CreateBookingPage() {
     try {
       await refetchProperties();
     } catch (error) {
-      console.error('Failed to fetch properties:', error);
-      toast.error('Failed to fetch available properties');
+      console.error("Failed to fetch properties:", error);
+      toast.error("Failed to fetch available properties");
     }
   }, [refetchProperties, validateSearch]);
 
@@ -443,4 +443,3 @@ export default function CreateBookingPage() {
     </Card>
   );
 }
-
