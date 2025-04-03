@@ -147,8 +147,7 @@ export const propertyQueries = {
             SELECT 1 FROM bookings b
             WHERE b.apartment_id = a.id
               AND (
-                (b.check_in <= ${dateFrom} AND b.check_out > ${dateFrom})
-                OR (b.check_in < ${dateTo} AND b.check_out >= ${dateTo})
+                (b.check_in <= ${dateTo} AND b.check_out >= ${dateFrom})
               )
           )
       )

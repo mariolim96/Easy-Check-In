@@ -21,7 +21,7 @@ export const bookingQueries = {
         ${params.externalId ?? null},
         ${params.status},
         ${params.notes ?? null},
-        ${params.amount.toString()}
+        ${params.amount}
       )
       RETURNING *
     `;

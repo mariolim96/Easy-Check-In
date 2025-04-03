@@ -1,6 +1,7 @@
 import { Service } from "encore.dev/service";
 import { APIError, Gateway, Header } from "encore.dev/api";
 import { authHandler } from "encore.dev/auth";
+import { secret } from "encore.dev/config";
 import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins";
 import pg from "pg";
@@ -8,6 +9,22 @@ import { sendMail } from "../mail/mail.service";
 import { db } from "../../db/db";
 
 export default new Service("User");
+
+// Define all needed secrets within the service
+const NODE_ENV = secret("NODE_ENV");
+const DATABASE_URL = secret("DATABASE_URL");
+const BETTER_AUTH_SECRET = secret("BETTER_AUTH_SECRET");
+const BETTER_AUTH_URL = secret("BETTER_AUTH_URL");
+const MAIL_HOST = secret("MAIL_HOST");
+const MAIL_USERNAME = secret("MAIL_USERNAME");
+const MAIL_PASSWORD = secret("MAIL_PASSWORD");
+const MAIL_FROM = secret("MAIL_FROM");
+const GOOGLE_CLIENT_ID = secret("GOOGLE_CLIENT_ID");
+const GOOGLE_CLIENT_SECRET = secret("GOOGLE_CLIENT_SECRET");
+const EMAIL_VERIFICATION_CALLBACK_URL = secret(
+  "EMAIL_VERIFICATION_CALLBACK_URL",
+);
+const NEXT_PUBLIC_BETTER_AUTH_URL = secret("NEXT_PUBLIC_BETTER_AUTH_URL");
 
 interface AuthParams {
   cookie: Header<"Cookie">;
@@ -70,8 +87,8 @@ export const auth = betterAuth({
     "http://localhost:4000",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:4000",
-    "http://192.168.1.49:3000", // Add your local IP
-    "http://192.168.1.49:4000", // Add your local IP
+    "http://192.168.1.49:3000",
+    "http://192.168.1.49:4000",
     "*",
   ],
   advanced: {
@@ -106,6 +123,14 @@ export const auth = betterAuth({
             html: `<p>Click the link to reset your password: ${url}</p>`,
           });
         }
+      },
+    },
+  },
+  social: {
+    providers: {
+      google: {
+        clientId: GOOGLE_CLIENT_ID(),
+        clientSecret: GOOGLE_CLIENT_SECRET(),
       },
     },
   },

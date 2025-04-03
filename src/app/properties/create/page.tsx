@@ -106,6 +106,9 @@ export default function CreatePropertyPage() {
         Utente: alloggiatiConfig.username,
         Password: alloggiatiConfig.password,
         WsKey: alloggiatiConfig.wsKey,
+      }).catch((error) => {
+        console.error("Alloggiati API call failed:", error);
+        throw error;
       });
 
       if (tokenResponse.error) {

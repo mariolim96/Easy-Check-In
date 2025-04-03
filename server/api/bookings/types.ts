@@ -21,7 +21,7 @@ export interface CreateBookingParams {
   source: string;
   externalId: string | null;
   status: string;
-  amount: number;
+  amount: string;
   notes: string | null;
 }
 

@@ -11,7 +11,7 @@ const Encore = new Client(Local, {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      "Access-Control-Allow-Credentials": "true",
+      cookie: typeof window !== "undefined" ? document.cookie : "",
     },
   },
 });
