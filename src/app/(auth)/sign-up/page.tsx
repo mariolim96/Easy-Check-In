@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -18,53 +16,95 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signUp } from "@/lib/auth-client";
+import { signUp, useSession, sendVerificationEmail } from "@/lib/auth-client"; // Added useSession
 import { AuthSignIn, Home } from "@/routes";
 import { signUpSchema } from "@/zod/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Encore } from "@/lib/encore-client";
 
 export default function SignUp() {
   const router = useRouter();
   const [pending, setPending] = useState(false);
+  const { data: session } = useSession();
 
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
+      name: "mario",
+      email: "mario_996@hotmail.it",
+      password: "Kakapato96@",
+      confirmPassword: "Kakapato96@",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof signUpSchema>) => {
-    await signUp.email(
-      {
-        email: values.email,
-        password: values.password,
-        name: values.name,
-      },
-      {
-        onRequest: () => {
-          setPending(true);
-        },
-        onSuccess: () => {
-          toast.success("Successfully signed up!", {
-            description:
-              "You have successfully signed up! Please check your email for verification.",
-          });
+    try {
+      setPending(true);
 
-          router.push(Home());
-          router.refresh();
+      await signUp.email(
+        {
+          email: values.email,
+          password: values.password,
+          name: values.name,
         },
-        onError: (ctx) => {
-          toast.error("Something went wrong!", {
-            description: ctx.error.message ?? "Something went wrong.",
-          });
+        {
+          onRequest: () => {
+            setPending(true);
+          },
+          onSuccess: async () => {
+            debugger;
+            // Get the session after signup
+            // const session = await useSession();
+
+            // if (session?.data?.user) {
+            // Send verification email
+            try {
+              await sendVerificationEmail({
+                email: values.email,
+                callbackURL: "/", // The redirect URL after verification
+              });
+              // await Encore.Mail.sendVerificationEmail({
+              //   email: values.email,
+              //   token: session.data.user., // Assuming the token is in the session
+              //   callbackURL: window.location.origin, // Use current origin as callback URL
+              // });
+
+              toast.success("Successfully signed up!", {
+                description:
+                  "You have successfully signed up! Please check your email for verification.",
+              });
+            } catch (error) {
+              console.error("Failed to send verification email:", error);
+              toast.error(
+                "Signup successful but failed to send verification email",
+                {
+                  description:
+                    "Please try to resend the verification email later.",
+                },
+              );
+            }
+
+            router.push(Home());
+            router.refresh();
+          },
+          onError: (ctx) => {
+            toast.error("Something went wrong!", {
+              description: ctx.error.message ?? "Something went wrong.",
+            });
+          },
         },
-      },
-    );
-    setPending(false);
+      );
+    } catch (error) {
+      console.error("Signup error:", error);
+      toast.error("Failed to sign up", {
+        description:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
+      });
+    } finally {
+      setPending(false);
+    }
   };
 
   return (

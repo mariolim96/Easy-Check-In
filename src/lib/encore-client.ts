@@ -34,6 +34,7 @@ export default class Client {
   public readonly User: User.ServiceClient;
   public readonly Booking: Booking.ServiceClient;
   public readonly guests: guests.ServiceClient;
+  public readonly Mail: Mail.ServiceClient;
   public readonly Property: Property.ServiceClient;
 
   /**
@@ -48,6 +49,7 @@ export default class Client {
     this.User = new User.ServiceClient(base);
     this.Booking = new Booking.ServiceClient(base);
     this.guests = new guests.ServiceClient(base);
+    this.Mail = new Mail.ServiceClient(base);
     this.Property = new Property.ServiceClient(base);
   }
 }
@@ -394,6 +396,40 @@ export namespace guests {
   }
 }
 
+export namespace Mail {
+  export class ServiceClient {
+    private baseClient: BaseClient;
+
+    constructor(baseClient: BaseClient) {
+      this.baseClient = baseClient;
+    }
+
+    public async sendMailEndpoint(
+      params: mail.SendMailParams,
+    ): Promise<mail.SendMailResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/Mail.sendMailEndpoint`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as mail.SendMailResponse;
+    }
+
+    public async sendVerificationEmail(
+      params: mail.SendVerificationEmailParams,
+    ): Promise<mail.SendMailResponse> {
+      // Now make the actual call to the API
+      const resp = await this.baseClient.callTypedAPI(
+        "POST",
+        `/Mail.sendVerificationEmail`,
+        JSON.stringify(params),
+      );
+      return (await resp.json()) as mail.SendMailResponse;
+    }
+  }
+}
+
 export namespace Property {
   export class ServiceClient {
     private baseClient: BaseClient;
@@ -644,6 +680,25 @@ export namespace bookings {
 
   export interface UpdateBookingParams {
     status: string;
+  }
+}
+
+export namespace mail {
+  export interface SendMailParams {
+    to: string;
+    subject: string;
+    html: string;
+  }
+
+  export interface SendMailResponse {
+    success: boolean;
+    message: string;
+  }
+
+  export interface SendVerificationEmailParams {
+    email: string;
+    token: string;
+    callbackURL: string;
   }
 }
 

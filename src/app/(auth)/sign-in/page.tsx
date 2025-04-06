@@ -95,6 +95,10 @@ export default function SignIn() {
     await signIn.social(
       {
         provider: "google",
+        // TypeScript doesn't recognize redirectUri, but we can use it with a type assertion
+        // ...({
+        //   redirectUri: "http://localhost:4000/api/auth/callback/google",
+        // } as any),
       },
       {
         onRequest: () => {
@@ -105,6 +109,7 @@ export default function SignIn() {
           router.refresh();
         },
         onError: (ctx: ErrorContext) => {
+          console.error("Google sign-in error:", ctx.error);
           toast.error("Something went wrong!", {
             description: JSON.stringify(ctx.error),
           });

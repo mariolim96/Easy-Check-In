@@ -3,7 +3,7 @@ import { APIError, Gateway, Header } from "encore.dev/api";
 import { authHandler } from "encore.dev/auth";
 import { secret } from "encore.dev/config";
 import { betterAuth } from "better-auth";
-import { admin } from "better-auth/plugins";
+import { admin, openAPI } from "better-auth/plugins";
 import pg from "pg";
 import { sendMail } from "../mail/mail.service";
 import { db } from "../../db/db";
@@ -81,7 +81,6 @@ const { Pool } = pg;
 
 export const auth = betterAuth({
   database: new Pool({ connectionString: db.connectionString }),
-  emailAndPassword: { enabled: true },
   trustedOrigins: [
     "http://localhost:3000",
     "http://localhost:4000",
@@ -98,80 +97,170 @@ export const auth = betterAuth({
       sameSite: "none",
     },
   },
+  plugins: [openAPI(), admin()], //nextCookies() should be last plugin in the list
   session: {
-    cookieCache: { enabled: true, maxAge: 5 * 60 },
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // 1 day (every 1 day the session expiration is updated)
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // Cache duration in seconds
+    },
   },
   user: {
-    deleteUser: { enabled: true },
     additionalFields: {
-      role: { type: "string", default: "user", required: false },
+      role: {
+        type: "string",
+        default: "user",
+        required: false,
+        defaultValue: "user",
+      },
     },
-    emailAndPassword: {
+    changeEmail: {
       enabled: true,
-      requireEmailVerification: true,
-      sendResetPassword: async ({
-        user,
-        url,
-      }: {
-        user: { email: string };
-        url: string;
-      }) => {
-        if (user.email) {
-          await sendMail({
-            to: user.email,
-            subject: "Reset your password",
-            html: `<p>Click the link to reset your password: ${url}</p>`,
-          });
-        }
+      sendChangeEmailVerification: async ({ newEmail, url }) => {
+        await sendMail({
+          to: newEmail,
+          subject: "Verify your email change",
+          html: `<p>Click the link to verify: ${url}</p>`,
+        });
       },
     },
   },
-  social: {
-    providers: {
-      google: {
-        clientId: GOOGLE_CLIENT_ID(),
-        clientSecret: GOOGLE_CLIENT_SECRET(),
-      },
+  socialProviders: {
+    //   github: {
+    //     clientId: env.GITHUB_CLIENT_ID,
+    //     clientSecret: env.GITHUB_CLIENT_SECRET,
+    //   },
+    google: {
+      clientId: GOOGLE_CLIENT_ID(),
+      clientSecret: GOOGLE_CLIENT_SECRET(),
     },
   },
-  plugins: [admin()],
+
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      await sendMail({
+        to: user.email,
+        subject: "Reset your password",
+        html: `<p>Click the link to reset your password: ${url}</p>`,
+      });
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, token }) => {
+      const verificationUrl = `${BETTER_AUTH_URL()}/api/auth/verify-email?token=${token}&callbackURL=localhost:3000`;
+      await sendMail({
+        to: user.email,
+        subject: "Verify your email address",
+        html: `<p>Click the link to verify your email: ${verificationUrl}</p>`,
+      });
+    },
+  },
 });
 
-//   plugins: [openAPI(), admin(), nextCookies()], //nextCookies() should be last plugin in the list
-//   session: {
-//     expiresIn: 60 * 60 * 24 * 7, // 7 days
-//     updateAge: 60 * 60 * 24, // 1 day (every 1 day the session expiration is updated)
-//     cookieCache: {
-//       enabled: true,
-//       maxAge: 5 * 60, // Cache duration in seconds
+// export const auth = betterAuth({
+//   database: new Pool({ connectionString: db.connectionString }),
+//   emailAndPassword: { enabled: true },
+//   trustedOrigins: [
+//     "http://localhost:3000",
+//     "http://localhost:4000",
+//     "http://127.0.0.1:3000",
+//     "http://127.0.0.1:4000",
+//     "http://192.168.1.49:3000",
+//     "http://192.168.1.49:4000",
+//     "*",
+//   ],
+//   advanced: {
+//     defaultCookieAttributes: {
+//       secure: true,
+//       httpOnly: true,
+//       sameSite: "none",
 //     },
 //   },
+//   session: {
+//     cookieCache: { enabled: true, maxAge: 5 * 60 },
+//   },
 //   user: {
+//     deleteUser: { enabled: true },
 //     additionalFields: {
-//       role: {
-//         type: "string",
-//         default: "user",
-//         required: false,
-//         defaultValue: "user",
-//       },
+//       role: { type: "string", default: "user", required: false },
 //     },
-//     changeEmail: {
+//     emailAndPassword: {
 //       enabled: true,
-//       sendChangeEmailVerification: async ({ newEmail, url }) => {
+//       requireEmailVerification: true,
+//       sendVerificationEmail: async ({
+//         user,
+//         url,
+//       }: {
+//         user: any;
+//         url: string;
+//       }) => {
 //         await sendMail({
-//           to: newEmail,
-//           subject: "Verify your email change",
+//           to: user.email,
+//           subject: "Verify your email",
 //           html: `<p>Click the link to verify: ${url}</p>`,
 //         });
+//       },
+//       emailVerification: {
+//         sendOnSignUp: true,
+//         autoSignInAfterVerification: true,
+//         sendVerificationEmail: async ({
+//           user,
+//           token,
+//         }: {
+//           user: { email: string };
+//           token: string;
+//         }) => {
+//           const verificationUrl = `${BETTER_AUTH_URL()}/api/auth/verify-email?token=${token}&callbackURL=http://localhost:3000`;
+//           await sendMail({
+//             to: user.email,
+//             subject: "Verify your email address",
+//             html: `<p>Click the link to verify your email: ${verificationUrl}</p>`,
+//           });
+//         },
+//       },
+//       changeEmail: {
+//         enabled: true,
+//         sendChangeEmailVerification: async ({
+//           newEmail,
+//           url,
+//         }: {
+//           newEmail: string;
+//           url: string;
+//         }) => {
+//           await sendMail({
+//             to: newEmail,
+//             subject: "Verify your email change",
+//             html: `<p>Click the link to verify: ${url}</p>`,
+//           });
+//         },
+//       },
+//       sendResetPassword: async ({
+//         user,
+//         url,
+//       }: {
+//         user: { email: string };
+//         url: string;
+//       }) => {
+//         if (user.email) {
+//           await sendMail({
+//             to: user.email,
+//             subject: "Reset your password",
+//             html: `<p>Click the link to reset your password: ${url}</p>`,
+//           });
+//         }
 //       },
 //     },
 //   },
 //   socialProviders: {
-//     github: {
-//       clientId: env.GITHUB_CLIENT_ID,
-//       clientSecret: env.GITHUB_CLIENT_SECRET,
+//     google: {
+//       clientId: GOOGLE_CLIENT_ID(),
+//       clientSecret: GOOGLE_CLIENT_SECRET(),
 //     },
 //   },
-
-//   },
+//   plugins: [admin()],
 // });

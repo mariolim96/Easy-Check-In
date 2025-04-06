@@ -87,8 +87,8 @@ importers:
         specifier: ^0.38.4
         version: 0.38.4(@types/pg@8.11.11)(@types/react@19.0.12)(kysely@0.27.6)(pg@8.14.1)(postgres@3.4.5)(react@19.0.0)
       encore.dev:
-        specifier: ^1.46.14
-        version: 1.46.14
+        specifier: ^1.46.16
+        version: 1.46.16
       framer-motion:
         specifier: ^12.4.10
         version: 12.5.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -2106,8 +2106,8 @@ packages:
   enabled@2.0.0:
     resolution: {integrity: sha512-AKrN98kuwOzMIdAizXGI86UFBoo26CL21UM763y1h/GMSJ4/OHU9k2YlsmBpyScFo/wbLzWQJBMCW4+IO3/+OQ==}
 
-  encore.dev@1.46.14:
-    resolution: {integrity: sha512-jmyLgFc+JCqcJOP6H/yisdrqKY+3yU0njlKyw+rf4TFDJjlG5ykdCizCl6IPcBnClhMP9nFo5dPnHBFPdOgKfA==}
+  encore.dev@1.46.16:
+    resolution: {integrity: sha512-Q2VraAOyop7QOAA5YIAraTM7/4v75DZ7zilx2KHQMZ4qUN+NVjqnsKWuQbj9l4jtq3V+2KtV59VLRHwmc7d4tg==}
     engines: {node: '>=18.0.0'}
 
   entities@4.5.0:
@@ -5650,7 +5650,7 @@ snapshots:
 
   enabled@2.0.0: {}
 
-  encore.dev@1.46.14: {}
+  encore.dev@1.46.16: {}
 
   entities@4.5.0: {}
 
