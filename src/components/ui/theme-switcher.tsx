@@ -24,7 +24,6 @@ const themes = [
   },
 ] as const;
 
-type Theme = (typeof themes)[number]["key"];
 
 export type ThemeSwitcherProps = {
   className?: string;

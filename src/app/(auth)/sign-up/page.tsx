@@ -20,12 +20,11 @@ import { signUp, useSession, sendVerificationEmail } from "@/lib/auth-client"; /
 import { AuthSignIn, Home } from "@/routes";
 import { signUpSchema } from "@/zod/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Encore } from "@/lib/encore-client";
+
 
 export default function SignUp() {
   const router = useRouter();
   const [pending, setPending] = useState(false);
-  const { data: session } = useSession();
 
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),

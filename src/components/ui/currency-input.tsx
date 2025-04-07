@@ -1,4 +1,5 @@
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
+import type { ChangeEvent } from "react";
 import { Input } from "./input";
 
 export function InlineCurrencyInput({
@@ -44,7 +45,7 @@ export function InlineCurrencyInput({
     } else {
       setDisplayValue(formatAsCurrency(input));
     }
-    onChange && onChange(e);
+    onChange?.(e);
   };
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -55,11 +56,11 @@ export function InlineCurrencyInput({
     e.target.select();
   };
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleBlur = (_e: React.FocusEvent<HTMLInputElement>) => {
     setIsFocused(false);
     // Format the value when the input loses focus
     setDisplayValue(formatAsCurrency(rawValue));
-    onBlur && onBlur(formatAsCurrency(rawValue, false).replace(",", "."));
+    onBlur?.(formatAsCurrency(rawValue, false).replace(",", "."));
   };
 
   return (
@@ -77,3 +78,4 @@ export function InlineCurrencyInput({
     </div>
   );
 }
+

@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
+import type { ControllerRenderProps, FieldValues } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -213,8 +214,11 @@ function CreateGuestForm() {
 
   // Add this handler for text inputs
   const handleUppercaseInput = (
-    field: any,
-    event: React.ChangeEvent<HTMLInputElement>,
+    field: {
+      onChange: (value: string) => void;
+      value: string;
+    },
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const upperValue = event.target.value.toUpperCase();
     field.onChange(upperValue);
@@ -714,3 +718,6 @@ export default function CreateGuestPage() {
     </Suspense>
   );
 }
+
+
+
