@@ -24,7 +24,6 @@ const themes = [
   },
 ] as const;
 
-
 export type ThemeSwitcherProps = {
   className?: string;
 };

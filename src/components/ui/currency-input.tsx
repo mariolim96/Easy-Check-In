@@ -78,4 +78,3 @@ export function InlineCurrencyInput({
     </div>
   );
 }
-

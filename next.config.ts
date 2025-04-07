@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: true,
   experimental: {
     reactCompiler: env.NODE_ENV === "production",
+    dynamicIO: true,
+    ppr: true,
   },
 
   images: {

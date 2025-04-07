@@ -21,7 +21,6 @@ import { AuthSignIn, Home } from "@/routes";
 import { signUpSchema } from "@/zod/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-
 export default function SignUp() {
   const router = useRouter();
   const [pending, setPending] = useState(false);

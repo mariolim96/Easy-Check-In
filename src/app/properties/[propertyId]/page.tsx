@@ -1,182 +1,133 @@
-"use client";
-
-import { useQuery } from "@tanstack/react-query";
-import {
-  ArrowLeft,
-  Building2,
-  MapPin,
-  Key,
-  Bed,
-  Bath,
-  User,
-  Plus,
-  Pencil,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Properties } from "@/routes";
+import { Suspense } from "react";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Encore } from "@/lib/utils";
-import { useParams, usePush } from "@/routes/hooks";
-import { PropertyDetail } from "@/routes";
+import { PropertyHeader } from "@/components/properties/detail/PropertyHeader";
+import { PropertyStats } from "@/components/properties/detail/PropertyStats";
+import { ApartmentSection } from "@/components/properties/detail/ApartmentSection";
 
-export default function PropertyPage() {
-  const params = useParams(PropertyDetail);
-  const push = usePush(Properties);
+export async function generateMetadata(props: {
+  params: { propertyId: string };
+}): Promise<Metadata> {
+  try {
+    // Use dynamic import to ensure params are properly resolved in PPR mode
+    const { params } = props;
+    const propertyId = params.propertyId;
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["property", params.propertyId],
-    queryFn: async () => {
-      const response = await Encore.Property.getProperty({
-        propertyId: params.propertyId,
-      });
-      // Enhance the data with mock fields
-      return {
-        property: {
-          ...response.property,
-          apartments: response.property.apartments.map((apt) => ({
-            ...apt,
-            bedrooms: Math.floor(Math.random() * 3) + 1,
-            bathrooms: Math.floor(Math.random() * 2) + 1,
-            bookings: Array(Math.floor(Math.random() * 5))
-              .fill(null)
-              .map((_, i) => ({ id: `booking-${i}` })),
-          })),
-        },
-      };
-    },
-  });
+    const response = await Encore.Property.getProperty({
+      propertyId,
+    });
 
-  if (isLoading) {
-    return (
-      <div className="flex h-[400px] items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-lg font-medium">Loading property details...</h2>
-        </div>
-      </div>
-    );
+    return {
+      title: response.property.name,
+      description: `Manage ${response.property.name} and its apartments`,
+    };
+  } catch (error) {
+    return {
+      title: "Property Details",
+      description: "View and manage property details",
+    };
   }
+}
 
-  if (isError || !data?.property) {
-    return (
-      <Card className="bg-destructive/10">
-        <CardContent className="flex flex-col items-center justify-center p-6">
-          <p className="mb-4 text-destructive">
-            {error instanceof Error ? error.message : "Property not found"}
-          </p>
-          <Button variant="outline" onClick={() => push({})}>
-            Back to Properties
-          </Button>
-        </CardContent>
-      </Card>
-    );
+async function getProperty(propertyId: string) {
+  try {
+    const response = await Encore.Property.getProperty({
+      propertyId,
+    });
+
+    // Enhance the data with mock fields - using a deterministic approach
+    // to avoid client/server mismatch
+    return {
+      property: {
+        ...response.property,
+        apartments: response.property.apartments.map((apt, index) => ({
+          ...apt,
+          bedrooms: (index % 3) + 1, // 1, 2, or 3 bedrooms
+          bathrooms: (index % 2) + 1, // 1 or 2 bathrooms
+          bookings: Array(index % 5)
+            .fill(null)
+            .map((_, i) => ({ id: `booking-${i}` })),
+        })),
+      },
+    };
+  } catch (error) {
+    notFound();
   }
+}
 
+export default async function PropertyPage(props: {
+  params: { propertyId: string };
+}) {
+  // Use dynamic import to ensure params are properly resolved in PPR mode
+  const { params } = props;
+  const propertyId = params.propertyId;
+
+  // Now we can safely use propertyId
+  const data = await getProperty(propertyId);
   const { property } = data;
-  const totalApartments = property.apartments.length;
-  const totalBeds = property.apartments.reduce(
-    (sum, apt) => sum + apt.bedrooms,
-    0,
-  );
-  const totalBaths = property.apartments.reduce(
-    (sum, apt) => sum + apt.bathrooms,
-    0,
-  );
-  const totalGuests = property.apartments.reduce(
-    (sum, apt) => sum + apt.maxGuests,
-    0,
-  );
 
   return (
     <div className="animate-fade-in container mx-auto space-y-8 p-6">
-      <div className="mb-6 flex items-center gap-4">
-        <Properties.Link>
-          <Button variant="outline" size="icon" className="h-8 w-8">
-            <ArrowLeft size={16} />
-          </Button>
-        </Properties.Link>
-        <div>
-          <h1 className="flex items-center gap-2 text-3xl font-semibold tracking-tight">
-            <Building2 className="h-6 w-6" />
-            {property.name}
-          </h1>
-          <div className="flex items-center text-sm text-muted-foreground">
-            <MapPin size={16} className="mr-1" />
-            <span>{property.address}</span>
-          </div>
-        </div>
-      </div>
+      <PropertyHeader property={property} />
 
-      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div className="flex flex-col items-center justify-center rounded-md border bg-background p-4">
-          <Key size={20} className="mb-2 text-primary" />
-          <span className="text-lg font-semibold">{totalApartments}</span>
-          <span className="text-xs text-muted-foreground">Apartments</span>
-        </div>
-        <div className="flex flex-col items-center justify-center rounded-md border bg-background p-4">
-          <User size={20} className="mb-2 text-primary" />
-          <span className="text-lg font-semibold">{totalGuests}</span>
-          <span className="text-xs text-muted-foreground">Max Guests</span>
-        </div>
-        <div className="flex flex-col items-center justify-center rounded-md border bg-background p-4">
-          <Bed size={20} className="mb-2 text-primary" />
-          <span className="text-lg font-semibold">{totalBeds}</span>
-          <span className="text-xs text-muted-foreground">Bedrooms</span>
-        </div>
-        <div className="flex flex-col items-center justify-center rounded-md border bg-background p-4">
-          <Bath size={20} className="mb-2 text-primary" />
-          <span className="text-lg font-semibold">{totalBaths}</span>
-          <span className="text-xs text-muted-foreground">Bathrooms</span>
-        </div>
-      </div>
+      <Suspense fallback={<PropertyStatsSkeleton />}>
+        <PropertyStats property={property} />
+      </Suspense>
 
+      <Suspense fallback={<ApartmentSectionSkeleton />}>
+        <ApartmentSection property={property} />
+      </Suspense>
+    </div>
+  );
+}
+
+function PropertyStatsSkeleton() {
+  return (
+    <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      {[1, 2, 3, 4].map((i) => (
+        <div
+          key={i}
+          className="flex flex-col items-center justify-center rounded-md border bg-background p-4"
+        >
+          <div className="mb-2 h-5 w-5 animate-pulse rounded-full bg-muted"></div>
+          <div className="h-6 w-8 animate-pulse rounded bg-muted"></div>
+          <div className="mt-1 h-4 w-20 animate-pulse rounded bg-muted"></div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ApartmentSectionSkeleton() {
+  return (
+    <>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Apartments</h3>
-        <Button className="flex items-center gap-1">
-          <Plus size={16} />
-          Add Apartment
-        </Button>
+        <div className="h-6 w-32 animate-pulse rounded bg-muted"></div>
+        <div className="h-9 w-36 animate-pulse rounded bg-muted"></div>
       </div>
 
       <div className="grid gap-4">
-        {property.apartments.map((apartment) => (
-          <Card key={apartment.id} className="overflow-hidden">
-            <CardContent className="p-4">
-              <div className="mb-2 flex items-start justify-between">
-                <h4 className="text-base font-medium">{apartment.name}</h4>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <Pencil size={16} />
-                </Button>
-              </div>
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="overflow-hidden rounded-lg border p-4">
+            <div className="mb-2 flex items-start justify-between">
+              <div className="h-5 w-40 animate-pulse rounded bg-muted"></div>
+              <div className="h-8 w-8 animate-pulse rounded-full bg-muted"></div>
+            </div>
 
-              <div className="mb-2 grid grid-cols-3 gap-4">
-                <div className="flex items-center gap-1.5">
-                  <User size={16} className="text-muted-foreground" />
-                  <span className="text-sm">{apartment.maxGuests} guests</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Bed size={16} className="text-muted-foreground" />
-                  <span className="text-sm">{apartment.bedrooms} bed</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Bath size={16} className="text-muted-foreground" />
-                  <span className="text-sm">{apartment.bathrooms} bath</span>
-                </div>
-              </div>
+            <div className="mb-2 grid grid-cols-3 gap-4">
+              {[1, 2, 3].map((j) => (
+                <div
+                  key={j}
+                  className="h-5 animate-pulse rounded bg-muted"
+                ></div>
+              ))}
+            </div>
 
-              <div className="text-sm text-muted-foreground">
-                {apartment.bookings.length} bookings
-              </div>
-            </CardContent>
-          </Card>
+            <div className="h-4 w-24 animate-pulse rounded bg-muted"></div>
+          </div>
         ))}
       </div>
-
-      <div className="mt-8 flex justify-end border-t pt-6">
-        <Button>
-          <Pencil size={16} className="mr-2" />
-          Edit Property
-        </Button>
-      </div>
-    </div>
+    </>
   );
 }

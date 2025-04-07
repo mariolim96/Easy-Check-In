@@ -1,25 +1,51 @@
-import React from "react";
-export default async function Home() {
+import { Suspense } from "react";
+import { Metadata } from "next";
+import { DashboardSummary } from "@/components/dashboard/DashboardSummary";
+import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "Overview of your properties, bookings, and guests",
+};
+
+export default function Home() {
   return (
     <div className="flex flex-1">
-      <div className="flex h-full w-full flex-1 flex-col gap-2 rounded-tl-2xl border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900 md:p-10">
-        <div className="flex gap-2">
-          {[1, 3, 2, 4].map((i) => (
-            <div
-              key={i}
-              className="h-20 w-full animate-pulse rounded-lg bg-gray-100 dark:bg-neutral-800"
-            ></div>
-          ))}
-        </div>
-        <div className="flex flex-1 gap-2">
-          {[5, 6].map((i) => (
-            <div
-              key={i}
-              className="h-full w-full animate-pulse rounded-lg bg-gray-100 dark:bg-neutral-800"
-            ></div>
-          ))}
-        </div>
+      <div className="flex h-full w-full flex-1 flex-col gap-4 rounded-tl-2xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900 md:p-10">
+        <Suspense fallback={<DashboardSummarySkeleton />}>
+          <DashboardSummary />
+        </Suspense>
+
+        <Suspense fallback={<DashboardChartsSkeleton />}>
+          <DashboardCharts />
+        </Suspense>
       </div>
+    </div>
+  );
+}
+
+function DashboardSummarySkeleton() {
+  return (
+    <div className="flex gap-4 overflow-hidden">
+      {[1, 2, 3, 4].map((i) => (
+        <div
+          key={i}
+          className="h-24 w-full animate-pulse rounded-lg bg-gray-100 dark:bg-neutral-800"
+        ></div>
+      ))}
+    </div>
+  );
+}
+
+function DashboardChartsSkeleton() {
+  return (
+    <div className="flex flex-1 gap-4">
+      {[1, 2].map((i) => (
+        <div
+          key={i}
+          className="h-full w-full animate-pulse rounded-lg bg-gray-100 dark:bg-neutral-800"
+        ></div>
+      ))}
     </div>
   );
 }
