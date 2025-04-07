@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
-import { Booking } from "./calendar/types";
+import type { Booking } from "./calendar/types";
 import { format } from "date-fns";
 import { getBookingForDate } from "./calendar/calendarUtils";
 import CalendarDayContent from "./calendar/calendarDayContent";

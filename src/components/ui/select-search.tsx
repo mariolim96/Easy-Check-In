@@ -18,7 +18,8 @@ import {
 } from "@/components/ui/popover";
 import { Check, ChevronDown } from "lucide-react";
 import { useId, useState } from "react";
-import { FixedSizeList as List, ListChildComponentProps } from "react-window";
+import { FixedSizeList as List } from "react-window";
+import type { ListChildComponentProps } from "react-window";
 
 export interface SelectOption {
   value: string;

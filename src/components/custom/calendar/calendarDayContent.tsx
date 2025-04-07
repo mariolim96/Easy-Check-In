@@ -1,7 +1,7 @@
-import { Booking } from "./types";
+import type { Booking } from "./types";
 import { cn } from "@/lib/utils";
 import { format, isSameDay } from "date-fns";
-import { DayContentProps } from "react-day-picker";
+import type { DayContentProps } from "react-day-picker";
 import { hasBookings, isCheckIn, isCheckOut } from "./calendarUtils";
 
 interface CalendarDayContentProps extends DayContentProps {
@@ -13,7 +13,7 @@ const CalendarDayContent = ({
   date: day,
   selectedDate,
   bookings,
-  ...props
+  ..._props
 }: CalendarDayContentProps) => {
   const isSelected = selectedDate && isSameDay(day, selectedDate);
   const hasBooking = hasBookings(day, bookings);

@@ -1,103 +1,131 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
+import { TrendingUp } from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
 
 export function DashboardCharts() {
-  const { data: bookingData } = useQuery({
-    queryKey: ["dashboard-bookings"],
-    queryFn: async () => {
-      // Static mock data to ensure consistency between server and client
-      return {
-        months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-        bookings: [12, 18, 15, 22, 30, 28],
-      };
-    },
-  });
+  const bookingData = [
+    { month: "Jan", bookings: 12 },
+    { month: "Feb", bookings: 18 },
+    { month: "Mar", bookings: 15 },
+    { month: "Apr", bookings: 22 },
+    { month: "May", bookings: 30 },
+    { month: "Jun", bookings: 28 },
+  ];
 
-  const { data: revenueData } = useQuery({
-    queryKey: ["dashboard-revenue"],
-    queryFn: async () => {
-      // Static mock data to ensure consistency between server and client
-      return {
-        months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-        revenue: [3200, 4800, 3900, 5600, 7800, 7200],
-      };
-    },
-  });
+  const revenueData = [
+    { month: "Jan", revenue: 3200 },
+    { month: "Feb", revenue: 4800 },
+    { month: "Mar", revenue: 3900 },
+    { month: "Apr", revenue: 5600 },
+    { month: "May", revenue: 7800 },
+    { month: "Jun", revenue: 7200 },
+  ];
 
   return (
     <div className="grid flex-1 gap-4 md:grid-cols-2">
       <Card>
         <CardHeader>
           <CardTitle>Bookings</CardTitle>
+          <CardDescription>January - June 2024</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-[300px] w-full">
-            {bookingData ? (
-              <div className="flex h-full flex-col justify-end">
-                <div className="flex h-[240px] items-end gap-2">
-                  {bookingData.bookings.map((value, i) => (
-                    <div
-                      key={i}
-                      className="relative flex w-full flex-col items-center"
-                    >
-                      <div
-                        className="w-full rounded-t bg-primary"
-                        style={{
-                          height: `${(value / Math.max(...bookingData.bookings)) * 100}%`,
-                        }}
-                      ></div>
-                      <span className="mt-2 text-xs">
-                        {bookingData.months[i]}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="flex h-full items-center justify-center">
-                <p className="text-muted-foreground">Loading chart data...</p>
-              </div>
-            )}
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={bookingData}>
+                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <XAxis dataKey="month" tickLine={false} axisLine={false} />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => `${value}`}
+                />
+                <Tooltip
+                  cursor={false}
+                  contentStyle={{
+                    background: "hsl(var(--background))",
+                    border: "1px solid hsl(var(--border))",
+                  }}
+                />
+                <Bar
+                  dataKey="bookings"
+                  fill="hsl(var(--primary))"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </CardContent>
+        <CardFooter className="flex-col items-start gap-2 text-sm">
+          <div className="flex gap-2 font-medium leading-none">
+            Trending up by 15% this month <TrendingUp className="h-4 w-4" />
+          </div>
+          <div className="leading-none text-muted-foreground">
+            Total bookings for the last 6 months
+          </div>
+        </CardFooter>
       </Card>
 
       <Card>
         <CardHeader>
           <CardTitle>Revenue</CardTitle>
+          <CardDescription>January - June 2024</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-[300px] w-full">
-            {revenueData ? (
-              <div className="flex h-full flex-col justify-end">
-                <div className="flex h-[240px] items-end gap-2">
-                  {revenueData.revenue.map((value, i) => (
-                    <div
-                      key={i}
-                      className="relative flex w-full flex-col items-center"
-                    >
-                      <div
-                        className="w-full rounded-t bg-green-500"
-                        style={{
-                          height: `${(value / Math.max(...revenueData.revenue)) * 100}%`,
-                        }}
-                      ></div>
-                      <span className="mt-2 text-xs">
-                        {revenueData.months[i]}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="flex h-full items-center justify-center">
-                <p className="text-muted-foreground">Loading chart data...</p>
-              </div>
-            )}
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={revenueData}>
+                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <XAxis dataKey="month" tickLine={false} axisLine={false} />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => `$${value.toLocaleString()}`}
+                />
+                <Tooltip
+                  cursor={false}
+                  contentStyle={{
+                    background: "hsl(var(--background))",
+                    border: "1px solid hsl(var(--border))",
+                  }}
+                  formatter={(value) => [
+                    `$${value.toLocaleString()}`,
+                    "Revenue",
+                  ]}
+                />
+                <Bar
+                  dataKey="revenue"
+                  fill="hsl(var(--secondary))"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </CardContent>
+        <CardFooter className="flex-col items-start gap-2 text-sm">
+          <div className="flex gap-2 font-medium leading-none">
+            Trending up by 25% this month <TrendingUp className="h-4 w-4" />
+          </div>
+          <div className="leading-none text-muted-foreground">
+            Total revenue for the last 6 months
+          </div>
+        </CardFooter>
       </Card>
     </div>
   );

@@ -56,7 +56,7 @@ export function CreatePropertyForm() {
       hasSciaaLicense: false,
       alloggiatiConfig: {
         username: "NA018476",
-        
+
         password: "4b9bNK3h",
         wsKey: "",
       },
@@ -311,7 +311,10 @@ export function CreatePropertyForm() {
                         <FormItem>
                           <FormLabel>Name</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="Enter apartment name" />
+                            <Input
+                              {...field}
+                              placeholder="Enter apartment name"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -329,7 +332,9 @@ export function CreatePropertyForm() {
                               type="number"
                               min={1}
                               {...field}
-                              onChange={(e) => field.onChange(Number(e.target.value))}
+                              onChange={(e) =>
+                                field.onChange(Number(e.target.value))
+                              }
                             />
                           </FormControl>
                           <FormMessage />
@@ -369,4 +374,3 @@ export function CreatePropertyForm() {
     </div>
   );
 }
-

@@ -3,7 +3,6 @@
 import { Building2, Calendar, Users, CreditCard } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
-// import { Encore } from "@/lib/utils";
 
 export function DashboardSummary() {
   const { data } = useQuery({

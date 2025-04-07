@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signUp, useSession, sendVerificationEmail } from "@/lib/auth-client"; // Added useSession
+import { signUp, sendVerificationEmail } from "@/lib/auth-client";
 import { AuthSignIn, Home } from "@/routes";
 import { signUpSchema } from "@/zod/zod";
 import { zodResolver } from "@hookform/resolvers/zod";

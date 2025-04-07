@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { DashboardSummary } from "@/components/dashboard/DashboardSummary";
 import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <div className="flex flex-1">
-      <div className="flex h-full w-full flex-1 flex-col gap-4 rounded-tl-2xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900 md:p-10">
+      <div className="flex h-full w-full flex-1 flex-col gap-4">
         <Suspense fallback={<DashboardSummarySkeleton />}>
           <DashboardSummary />
         </Suspense>

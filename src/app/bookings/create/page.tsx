@@ -311,13 +311,12 @@ export default function CreateBookingPage() {
                   <FormField
                     control={form.control}
                     name="totalAmount"
-                    render={({ field }) => (
+                    render={({ field: _ }) => (
                       <FormItem>
                         <FormLabel>Total Amount</FormLabel>
                         <FormControl>
                           <CurrencyInput
                             onBlur={(e) => {
-                              debugger;
                               form.setValue("totalAmount", e);
                             }}
                           />

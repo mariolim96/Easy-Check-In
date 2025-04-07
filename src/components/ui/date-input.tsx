@@ -1,8 +1,4 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
-/* eslint-disable @tanstack/query/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable react/no-children-prop */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 "use client";

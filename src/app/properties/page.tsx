@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { PropertiesHeader } from "@/components/properties/PropertiesHeader";
 import { PropertyTabs } from "@/components/properties/PropertyTabs";
 

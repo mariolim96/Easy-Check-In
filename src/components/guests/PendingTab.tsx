@@ -1,16 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Upload,
-  ChevronDown,
-  ChevronRight,
-  Eye,
-  FileEdit,
-  Filter,
-  Trash2,
-  UserPlus,
-} from "lucide-react";
+import { Upload, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -27,15 +18,6 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 import React from "react";
 
 export interface Guest {

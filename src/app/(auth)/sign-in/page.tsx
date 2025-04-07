@@ -28,7 +28,6 @@ import { useState } from "react";
 export default function SignIn() {
   const router = useRouter();
 
-  const [pendingCredentials, setPendingCredentials] = useState(false);
   const [pendingGoogle, setPendingGoogle] = useState(false);
 
   const form = useForm<z.infer<typeof signInSchema>>({
@@ -55,7 +54,6 @@ export default function SignIn() {
         },
         {
           onRequest: () => {
-            setPendingCredentials(true);
             console.log("Sign in request started");
           },
           onSuccess: async (response) => {
@@ -84,8 +82,6 @@ export default function SignIn() {
       toast.error("Sign in failed", {
         description: "An unexpected error occurred",
       });
-    } finally {
-      setPendingCredentials(false);
     }
   };
 

@@ -1,4 +1,4 @@
-import { Booking } from "./types";
+import type { Booking } from "./types";
 import { isSameDay, isWithinInterval } from "date-fns";
 
 export const hasBookings = (day: Date, bookings: Booking[]) => {

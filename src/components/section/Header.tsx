@@ -15,10 +15,56 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { ThemeSwitcher } from "../ui/theme-switcher";
 import { ChevronDown } from "lucide-react";
+import { useEffect } from "react";
 
 export default function Header() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, isPending: status } = useSession();
+  console.log(" data:", session);
+
+  // Force router refresh when session changes
+  useEffect(() => {
+    if (!status) {
+      router.refresh();
+    }
+  }, [status, router]);
+
+  const handleLogout = async () => {
+    try {
+      await signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            // Clear all cookies
+            document.cookie.split(";").forEach((c) => {
+              document.cookie = c
+                .replace(/^ +/, "")
+                .replace(
+                  /=.*/,
+                  "=;expires=" + new Date().toUTCString() + ";path=/",
+                );
+            });
+            router.push(Home());
+            router.refresh();
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  // Show loading state or nothing while checking session
+  if (status) {
+    return (
+      <div className="sticky top-0 z-50 backdrop-blur">
+        <div className="container ml-auto mr-6 flex h-14 max-w-screen-2xl items-center justify-end">
+          <div className="flex items-center gap-2">
+            <ThemeSwitcher />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="sticky top-0 z-50 backdrop-blur">
@@ -26,13 +72,15 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <ThemeSwitcher />
 
-          {session ? (
+          {!status && session ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative">
                   <Avatar className="h-8 w-8 rounded-full">
                     <AvatarImage src="/images/77627641.jpg" alt="@shadcn" />
-                    <AvatarFallback>SC</AvatarFallback>
+                    <AvatarFallback>
+                      {session.user.name?.charAt(0) ?? "U"}
+                    </AvatarFallback>
                   </Avatar>
                   <ChevronDown
                     size={16}
@@ -57,27 +105,7 @@ export default function Header() {
                 <DropdownMenuItem>
                   <DashboardAdmin.Link>Dashboard</DashboardAdmin.Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() =>
-                    signOut({
-                      fetchOptions: {
-                        onSuccess: () => {
-                          document.cookie.split(";").forEach((c) => {
-                            document.cookie = c
-                              .replace(/^ +/, "")
-                              .replace(
-                                /=.*/,
-                                "=;expires=" +
-                                  new Date().toUTCString() +
-                                  ";path=/",
-                              );
-                          });
-                          router.push(Home());
-                        },
-                      },
-                    })
-                  }
-                >
+                <DropdownMenuItem onClick={handleLogout}>
                   Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>

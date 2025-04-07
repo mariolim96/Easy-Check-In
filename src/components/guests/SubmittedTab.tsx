@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { format } from "date-fns";
 import {
   ClipboardList,
@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Guest } from "./PendingTab";
+import type { Guest } from "./PendingTab";
 
 interface SubmittedTabProps {
   guests: Guest[];
@@ -177,8 +177,8 @@ export function SubmittedTab({ guests, isLoading }: SubmittedTabProps) {
                 </TableHeader>
                 <TableBody>
                   {guests.map((guest) => (
-                    <>
-                      <TableRow key={guest.id} className="border-b bg-card">
+                    <React.Fragment key={guest.id}>
+                      <TableRow className="border-b bg-card">
                         <TableCell>
                           {hasMembers(guest) && (
                             <Button
@@ -274,7 +274,7 @@ export function SubmittedTab({ guests, isLoading }: SubmittedTabProps) {
                             </TableCell>
                           </TableRow>
                         ))}
-                    </>
+                    </React.Fragment>
                   ))}
                 </TableBody>
               </Table>

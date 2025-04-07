@@ -33,11 +33,11 @@ export function PropertyTabs() {
       </TabsList>
 
       <TabsContent value="all">
-        <PropertyList properties={data?.properties || []} />
+        <PropertyList properties={data?.properties ?? []} />
       </TabsContent>
 
       <TabsContent value="apartments">
-        <ApartmentList properties={data?.properties || []} />
+        <ApartmentList properties={data?.properties ?? []} />
       </TabsContent>
     </Tabs>
   );

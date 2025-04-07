@@ -5,15 +5,7 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PendingTab } from "@/components/guests/PendingTab";
-import { Encore } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { SubmittedTab } from "@/components/guests/SubmittedTab";
 import { SettingsTab } from "@/components/guests/SettingsTab";
 import { ReceiptsTab } from "@/components/guests/ReceiptsTab";

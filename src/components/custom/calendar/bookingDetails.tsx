@@ -1,4 +1,4 @@
-import { Booking } from "./types";
+import type { Booking } from "./types";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ interface BookingDetailsProps {
 
 const BookingDetails = ({
   selectedBooking,
-  selectedDate,
+  selectedDate: _selectedDate,
 }: BookingDetailsProps) => {
   if (!selectedBooking) {
     return (

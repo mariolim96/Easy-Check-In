@@ -1,6 +1,5 @@
 "use client";
 
-import { Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { notFound } from "next/navigation";
 import { Encore } from "@/lib/utils";
@@ -10,15 +9,9 @@ import { ApartmentSection } from "@/components/properties/detail/ApartmentSectio
 import { PropertyDetail } from "@/routes";
 import { useParams } from "@/routes/hooks";
 
-export default function PropertyPage() {
-  return (
-    <Suspense fallback={<PropertySkeleton />}>
-      <PropertyContent />
-    </Suspense>
-  );
-}
-
-function PropertyContent() {
+// This component is not used in the current implementation
+// It's kept as a reference for client-side data fetching if needed
+export function PropertyClientContent() {
   const params = useParams(PropertyDetail);
   const { data, isLoading, isError } = useQuery({
     queryKey: ["property", params.propertyId],

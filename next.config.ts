@@ -7,8 +7,12 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: true,
   experimental: {
     reactCompiler: env.NODE_ENV === "production",
-    dynamicIO: true,
+    // dynamicIO: true,
     ppr: true,
+    // useCache: true,
+    serverActions: {
+      bodySizeLimit: "2mb",
+    },
   },
 
   images: {
