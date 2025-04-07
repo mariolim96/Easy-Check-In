@@ -3,7 +3,7 @@
 import { Building2, Calendar, Users, CreditCard } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
-import { Encore } from "@/lib/utils";
+// import { Encore } from "@/lib/utils";
 
 export function DashboardSummary() {
   const { data } = useQuery({
@@ -22,21 +22,21 @@ export function DashboardSummary() {
   const summaryItems = [
     {
       title: "Properties",
-      value: data?.propertyCount || 0,
+      value: data?.propertyCount ?? 0,
       icon: Building2,
       color: "text-blue-500",
       bgColor: "bg-blue-100 dark:bg-blue-900/20",
     },
     {
       title: "Bookings",
-      value: data?.bookingCount || 0,
+      value: data?.bookingCount ?? 0,
       icon: Calendar,
       color: "text-green-500",
       bgColor: "bg-green-100 dark:bg-green-900/20",
     },
     {
       title: "Guests",
-      value: data?.guestCount || 0,
+      value: data?.guestCount ?? 0,
       icon: Users,
       color: "text-amber-500",
       bgColor: "bg-amber-100 dark:bg-amber-900/20",
