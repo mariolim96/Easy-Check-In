@@ -152,11 +152,11 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, token }) => {
-      const verificationUrl = `${BETTER_AUTH_URL()}/api/auth/verify-email?token=${token}&callbackURL=localhost:3000`;
+      const verificationUrl = `${EMAIL_VERIFICATION_CALLBACK_URL()}/email-verified?token=${token}`;
       await sendMail({
         to: user.email,
         subject: "Verify your email address",
-        html: `<p>Click the link to verify your email: ${verificationUrl}</p>`,
+        html: `<a href="${verificationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #0070f3; color: white; text-decoration: none; border-radius: 5px; margin: 10px 0;">Verify your email</a>`,
       });
     },
   },

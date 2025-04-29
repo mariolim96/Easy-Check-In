@@ -71,14 +71,13 @@ export interface GuestListItem {
   id: string;
   firstName: string;
   lastName: string;
+  gender: string;
+  dateOfBirth: string;
+  citizenship: string;
+  placeOfBirth: string;
   guestType: string;
   checkIn: string;
   checkOut: string;
-  document: {
-    documentType: string;
-    documentNumber: string;
-    documentIssueCountry: string;
-  };
   property: {
     id: string;
     name: string;
@@ -88,11 +87,18 @@ export interface GuestListItem {
     };
   };
   alloggiatiStatus: "pending" | "submitted" | "error";
-  members?: GuestListItem[];
   bookingId: string;
-  parent_id?: string;
+  parent_id: string | null;
 }
 
+export interface guestWithDocument extends GuestListItem {
+  document: {
+    documentType: string;
+    documentNumber: string;
+    documentIssueCountry: string;
+  };
+  members?: GuestListItem[];
+}
 export interface ListGuestsResponse {
-  guests: GuestListItem[];
+  guests: guestWithDocument[];
 }

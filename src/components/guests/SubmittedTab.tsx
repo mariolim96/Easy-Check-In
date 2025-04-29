@@ -26,10 +26,10 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
-import type { Guest } from "./PendingTab";
+import { guestWithDocument } from "../../../server/api/guests/types";
 
 interface SubmittedTabProps {
-  guests: Guest[];
+  guests: guestWithDocument[];
   isLoading: boolean;
 }
 
@@ -46,7 +46,7 @@ export function SubmittedTab({ guests, isLoading }: SubmittedTabProps) {
     );
   };
 
-  const hasMembers = (guest: Guest) =>
+  const hasMembers = (guest: guestWithDocument) =>
     guest.members && guest.members.length > 0;
 
   if (isLoading) {
@@ -141,10 +141,10 @@ export function SubmittedTab({ guests, isLoading }: SubmittedTabProps) {
                           <div className="font-medium">
                             {member.firstName} {member.lastName}
                           </div>
-                          <div className="text-sm text-muted-foreground">
+                          {/* <div className="text-sm text-muted-foreground">
                             {member.document.documentType} -{" "}
                             {member.document.documentNumber}
-                          </div>
+                          </div> */}
                         </div>
                       ))}
                     </div>
@@ -247,9 +247,9 @@ export function SubmittedTab({ guests, isLoading }: SubmittedTabProps) {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <div>{member.document.documentType}</div>
+                              {/* <div>Document not available</div> */}
                               <div className="text-sm text-muted-foreground">
-                                {member.document.documentNumber}
+                                Document not available
                               </div>
                             </TableCell>
                             <TableCell>

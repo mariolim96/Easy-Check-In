@@ -380,3 +380,7 @@ export const DOCUMENTI = [
     Descrizione: "TITOLO VIAGGIO RIF.POLIT.",
   },
 ];
+
+export const DOCUMENTI_MAP = new Map(
+  DOCUMENTI.map((doc) => [doc.Descrizione, doc.Codice]),
+);

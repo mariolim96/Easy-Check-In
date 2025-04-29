@@ -8,58 +8,6 @@ import type {
 import { db } from "../../db/db";
 import { getAuthData } from "~encore/auth";
 
-// export const createGuestWithBooking = api(
-//   { method: "POST", path: "/guests/booking", expose: true },
-//   async (params: CreateGuestWithBookingParams): Promise<GuestResponse> => {
-//     try {
-//       // Start a transaction since we're making multiple related insertions
-//       await db.exec`BEGIN`;
-
-//       // Create the guest
-//       const guest = await guestQueries.createGuest(params.guest);
-
-//       // Create the guest's document
-//       const document = await guestQueries.createGuestDocument(
-//         guest.id,
-//         params.guest.document,
-//       );
-
-//       // Link the guest to the booking
-//       await guestQueries.linkGuestToBooking({
-//         bookingId: params.bookingId,
-//         guestId: guest.id,
-//         guestType: params.guestType,
-//         checkIn: params.checkIn,
-//         checkOut: params.checkOut,
-//       });
-
-//       // Commit the transaction
-//       await db.exec`COMMIT`;
-
-//       return {
-//         guest,
-//         document: {
-//           documentIssueDate: document.document_issue_date,
-//           documentExpiryDate: document.document_expiry_date,
-//           documentIssuePlace: document.document_issue_place,
-//           documentType: document.document_type,
-//           documentNumber: document.document_number,
-//           documentScan: document.document_scan,
-//           documentIssueCountry: document.document_issue_country
-//         }
-//       };
-//     } catch (error) {
-//       // Rollback in case of any error
-//       await db.exec`ROLLBACK`;
-//       throw APIError.internal("Failed to create guest and link to booking").withDetails({
-//           cause: error,
-//           name: "",
-//           message: ""
-//       });
-//     }
-//   },
-// );
-
 export const createGuestWithBooking = api(
   { method: "POST", path: "/guests/booking", expose: true },
   async (params: CreateGuestWithBookingParams): Promise<GuestResponse> => {

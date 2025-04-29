@@ -57,10 +57,10 @@ export default function SignUp() {
             // if (session?.data?.user) {
             // Send verification email
             try {
-              await sendVerificationEmail({
-                email: values.email,
-                callbackURL: "/", // The redirect URL after verification
-              });
+              //   await sendVerificationEmail({
+              //     email: values.email,
+              //     callbackURL: "/", // The redirect URL after verification
+              //   });
               // await Encore.Mail.sendVerificationEmail({
               //   email: values.email,
               //   token: session.data.user., // Assuming the token is in the session

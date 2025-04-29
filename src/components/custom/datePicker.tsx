@@ -2,19 +2,25 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar } from "@/components/ui/date-input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { CalendarProps } from "../ui/date-input";
 
 interface DatePickerProps {
   value?: Date;
   onChange?: (date: Date | undefined) => void;
+  calendarProps?: Omit<CalendarProps, "mode" | "selected" | "onSelect">;
 }
 
-export function DatePicker({ value, onChange }: DatePickerProps) {
+export function DatePicker({
+  value,
+  onChange,
+  calendarProps,
+}: DatePickerProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -34,7 +40,8 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
           mode="single"
           selected={value}
           onSelect={onChange}
-          initialFocus
+          defaultMonth={value}
+          {...calendarProps}
         />
       </PopoverContent>
     </Popover>

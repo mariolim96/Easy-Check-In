@@ -1418,5 +1418,10 @@ export const STATI = [
 ];
 
 export const STATI_MAP = new Map(
-  STATI.map((stato) => [stato.Codice, stato.Descrizione]),
+  STATI.map(({ Codice, Descrizione, Provincia, DataFineVal }) => {
+    return [
+      Codice.toString(),
+      { Codice: Codice.toString(), Descrizione, Provincia, DataFineVal },
+    ];
+  }),
 );

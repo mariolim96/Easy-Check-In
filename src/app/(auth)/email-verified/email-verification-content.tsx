@@ -25,7 +25,9 @@ export default function EmailVerificationContent() {
   }, [searchParams]);
 
   if (state.error) {
-    toast.error("Failed to verify email");
+    toast.error("Failed to verify email:", {
+      description: state.error.message,
+    });
     void router.push("/");
     return null;
   }

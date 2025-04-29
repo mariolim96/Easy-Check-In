@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
+import { Upload, ChevronDown, ChevronRight, Trash2, Send } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -19,41 +19,50 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import React from "react";
-
-export interface Guest {
-  id: string;
-  firstName: string;
-  lastName: string;
-  guestType: string;
-  checkIn: string;
-  checkOut: string;
-  bookingId: string;
-  document: {
-    documentType: string;
-    documentNumber: string;
-    documentIssueCountry: string;
-  };
-  property: {
-    id: string;
-    name: string;
-    apartment: {
-      id: string;
-      name: string;
-    };
-  };
-  alloggiatiStatus: "pending" | "submitted";
-  documentScanUrl?: string;
-  members?: Guest[];
-}
+import { useToast } from "@/hooks/use-toast";
+import { Encore } from "@/lib/utils";
+import { guestWithDocument } from "../../../server/api/guests/types";
 
 export function PendingTab({
   guests,
   isLoading,
 }: {
-  guests: Guest[];
+  guests: guestWithDocument[];
   isLoading: boolean;
 }) {
   const [expandedGuests, setExpandedGuests] = useState<string[]>([]);
+  const { toast } = useToast();
+
+  const handleSendGuest = async (guest: guestWithDocument) => {
+    try {
+      debugger;
+      const response = await Encore.Alloggiati.sendFileUnico({
+        // Utente: guest.property.alloggiatiConfig.username,
+        // token: guest.property.alloggiatiConfig.token,
+        ElencoSchedine: guest,
+      });
+      console.log("Response from Alloggiati Web:", response);
+      //   if (response.success) {
+      //     toast({
+      //       title: "Success",
+      //       description: "Guest data sent to Alloggiati Web successfully",
+      //     });
+      //   } else {
+      //     toast({
+      //       title: "Error",
+      //       description: response.errors.join(", "),
+      //       variant: "destructive",
+      //     });
+      //   }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send guest data to Alloggiati Web",
+        variant: "destructive",
+      });
+      console.error(error);
+    }
+  };
 
   const toggleExpand = (guestId: string) => {
     setExpandedGuests((prev) =>
@@ -63,7 +72,7 @@ export function PendingTab({
     );
   };
 
-  const hasMembers = (guest: Guest) =>
+  const hasMembers = (guest: guestWithDocument) =>
     guest.members && guest.members.length > 0;
 
   if (isLoading) {
@@ -133,8 +142,8 @@ export function PendingTab({
                         {member.firstName} {member.lastName}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {member.document.documentType} -{" "}
-                        {member.document.documentNumber}
+                        {/* {member.document.documentType} -{" "}
+                        {member.document.documentNumber} */}
                       </div>
                     </div>
                   ))}
@@ -225,7 +234,14 @@ export function PendingTab({
                             Pending
                           </div>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="space-x-2 text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={async () => await handleSendGuest(guest)}
+                          >
+                            <Send className="h-4 w-4 text-primary" />
+                          </Button>
                           <Button variant="ghost" size="sm">
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
@@ -247,9 +263,9 @@ export function PendingTab({
                               </div>
                             </TableCell>
                             <TableCell>
-                              <div>{member.document.documentType}</div>
+                              {/* <div>{member.document.documentType}</div> */}
                               <div className="text-sm text-muted-foreground">
-                                {member.document.documentNumber}
+                                Document not available
                               </div>
                             </TableCell>
                             <TableCell>
@@ -266,10 +282,17 @@ export function PendingTab({
                                 Pending
                               </div>
                             </TableCell>
-                            <TableCell className="text-right">
-                              <Button variant="ghost" size="sm">
+                            <TableCell className="space-x-2 text-right">
+                              {/* <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleSendGuest(member)}
+                              >
+                                <Send className="h-4 w-4 text-primary" />
+                              </Button> */}
+                              {/* <Button variant="ghost" size="sm">
                                 <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
+                              </Button> */}
                             </TableCell>
                           </TableRow>
                         ))}
@@ -290,174 +313,174 @@ function handleSubmitAll() {
   console.log("Submitting all pending guests");
 }
 
-export const mockSubmittedGuests: Guest[] = [
-  {
-    id: "1",
-    firstName: "John",
-    lastName: "Doe",
-    guestType: "family_head",
-    checkIn: "2024-02-01",
-    checkOut: "2024-02-05",
-    bookingId: "booking1",
-    document: {
-      documentType: "passport",
-      documentNumber: "AB123456",
-      documentIssueCountry: "USA",
-    },
-    property: {
-      id: "prop1",
-      name: "Villa Serena",
-      apartment: {
-        id: "apt1",
-        name: "Suite 101",
-      },
-    },
-    alloggiatiStatus: "submitted",
-    documentScanUrl: "https://example.com/scan1.pdf",
-    members: [
-      {
-        id: "1a",
-        firstName: "Jane",
-        lastName: "Doe",
-        guestType: "family_member",
-        checkIn: "2024-02-01",
-        checkOut: "2024-02-05",
-        bookingId: "booking1",
-        document: {
-          documentType: "passport",
-          documentNumber: "AB123457",
-          documentIssueCountry: "USA",
-        },
-        property: {
-          id: "prop1",
-          name: "Villa Serena",
-          apartment: {
-            id: "apt1",
-            name: "Suite 101",
-          },
-        },
-        alloggiatiStatus: "submitted",
-      },
-      {
-        id: "1b",
-        firstName: "Jimmy",
-        lastName: "Doe",
-        guestType: "family_member",
-        checkIn: "2024-02-01",
-        checkOut: "2024-02-05",
-        bookingId: "booking1",
-        document: {
-          documentType: "passport",
-          documentNumber: "AB123458",
-          documentIssueCountry: "USA",
-        },
-        property: {
-          id: "prop1",
-          name: "Villa Serena",
-          apartment: {
-            id: "apt1",
-            name: "Suite 101",
-          },
-        },
-        alloggiatiStatus: "submitted",
-      },
-    ],
-  },
-  {
-    id: "2",
-    firstName: "Maria",
-    lastName: "Garcia",
-    guestType: "group_leader",
-    checkIn: "2024-02-03",
-    checkOut: "2024-02-10",
-    bookingId: "booking2",
-    document: {
-      documentType: "national_id",
-      documentNumber: "XY789012",
-      documentIssueCountry: "Spain",
-    },
-    property: {
-      id: "prop2",
-      name: "Casa Bella",
-      apartment: {
-        id: "apt2",
-        name: "Room 202",
-      },
-    },
-    alloggiatiStatus: "submitted",
-    documentScanUrl: "https://example.com/scan2.pdf",
-    members: [
-      {
-        id: "2a",
-        firstName: "Carlos",
-        lastName: "Garcia",
-        guestType: "group_member",
-        checkIn: "2024-02-03",
-        checkOut: "2024-02-10",
-        bookingId: "booking2",
-        document: {
-          documentType: "national_id",
-          documentNumber: "XY789013",
-          documentIssueCountry: "Spain",
-        },
-        property: {
-          id: "prop2",
-          name: "Casa Bella",
-          apartment: {
-            id: "apt2",
-            name: "Room 202",
-          },
-        },
-        alloggiatiStatus: "submitted",
-      },
-      {
-        id: "2b",
-        firstName: "Ana",
-        lastName: "Garcia",
-        guestType: "group_member",
-        checkIn: "2024-02-03",
-        checkOut: "2024-02-10",
-        bookingId: "booking2",
-        document: {
-          documentType: "national_id",
-          documentNumber: "XY789014",
-          documentIssueCountry: "Spain",
-        },
-        property: {
-          id: "prop2",
-          name: "Casa Bella",
-          apartment: {
-            id: "apt2",
-            name: "Room 202",
-          },
-        },
-        alloggiatiStatus: "submitted",
-      },
-    ],
-  },
-  {
-    id: "3",
-    firstName: "Robert",
-    lastName: "Smith",
-    guestType: "single_guest",
-    checkIn: "2024-02-05",
-    checkOut: "2024-02-08",
-    bookingId: "booking3",
-    document: {
-      documentType: "passport",
-      documentNumber: "UK456789",
-      documentIssueCountry: "UK",
-    },
-    property: {
-      id: "prop3",
-      name: "Mountain View",
-      apartment: {
-        id: "apt3",
-        name: "Room 303",
-      },
-    },
-    alloggiatiStatus: "submitted",
-    documentScanUrl: "https://example.com/scan3.pdf",
-    members: [],
-  },
-];
+// export const mockSubmittedGuests: Guest[] = [
+//   {
+//     id: "1",
+//     firstName: "John",
+//     lastName: "Doe",
+//     guestType: "family_head",
+//     checkIn: "2024-02-01",
+//     checkOut: "2024-02-05",
+//     bookingId: "booking1",
+//     document: {
+//       documentType: "passport",
+//       documentNumber: "AB123456",
+//       documentIssueCountry: "USA",
+//     },
+//     property: {
+//       id: "prop1",
+//       name: "Villa Serena",
+//       apartment: {
+//         id: "apt1",
+//         name: "Suite 101",
+//       },
+//     },
+//     alloggiatiStatus: "submitted",
+//     documentScanUrl: "https://example.com/scan1.pdf",
+//     members: [
+//       {
+//         id: "1a",
+//         firstName: "Jane",
+//         lastName: "Doe",
+//         guestType: "family_member",
+//         checkIn: "2024-02-01",
+//         checkOut: "2024-02-05",
+//         bookingId: "booking1",
+//         document: {
+//           documentType: "passport",
+//           documentNumber: "AB123457",
+//           documentIssueCountry: "USA",
+//         },
+//         property: {
+//           id: "prop1",
+//           name: "Villa Serena",
+//           apartment: {
+//             id: "apt1",
+//             name: "Suite 101",
+//           },
+//         },
+//         alloggiatiStatus: "submitted",
+//       },
+//       {
+//         id: "1b",
+//         firstName: "Jimmy",
+//         lastName: "Doe",
+//         guestType: "family_member",
+//         checkIn: "2024-02-01",
+//         checkOut: "2024-02-05",
+//         bookingId: "booking1",
+//         document: {
+//           documentType: "passport",
+//           documentNumber: "AB123458",
+//           documentIssueCountry: "USA",
+//         },
+//         property: {
+//           id: "prop1",
+//           name: "Villa Serena",
+//           apartment: {
+//             id: "apt1",
+//             name: "Suite 101",
+//           },
+//         },
+//         alloggiatiStatus: "submitted",
+//       },
+//     ],
+//   },
+//   {
+//     id: "2",
+//     firstName: "Maria",
+//     lastName: "Garcia",
+//     guestType: "group_leader",
+//     checkIn: "2024-02-03",
+//     checkOut: "2024-02-10",
+//     bookingId: "booking2",
+//     document: {
+//       documentType: "national_id",
+//       documentNumber: "XY789012",
+//       documentIssueCountry: "Spain",
+//     },
+//     property: {
+//       id: "prop2",
+//       name: "Casa Bella",
+//       apartment: {
+//         id: "apt2",
+//         name: "Room 202",
+//       },
+//     },
+//     alloggiatiStatus: "submitted",
+//     documentScanUrl: "https://example.com/scan2.pdf",
+//     members: [
+//       {
+//         id: "2a",
+//         firstName: "Carlos",
+//         lastName: "Garcia",
+//         guestType: "group_member",
+//         checkIn: "2024-02-03",
+//         checkOut: "2024-02-10",
+//         bookingId: "booking2",
+//         document: {
+//           documentType: "national_id",
+//           documentNumber: "XY789013",
+//           documentIssueCountry: "Spain",
+//         },
+//         property: {
+//           id: "prop2",
+//           name: "Casa Bella",
+//           apartment: {
+//             id: "apt2",
+//             name: "Room 202",
+//           },
+//         },
+//         alloggiatiStatus: "submitted",
+//       },
+//       {
+//         id: "2b",
+//         firstName: "Ana",
+//         lastName: "Garcia",
+//         guestType: "group_member",
+//         checkIn: "2024-02-03",
+//         checkOut: "2024-02-10",
+//         bookingId: "booking2",
+//         document: {
+//           documentType: "national_id",
+//           documentNumber: "XY789014",
+//           documentIssueCountry: "Spain",
+//         },
+//         property: {
+//           id: "prop2",
+//           name: "Casa Bella",
+//           apartment: {
+//             id: "apt2",
+//             name: "Room 202",
+//           },
+//         },
+//         alloggiatiStatus: "submitted",
+//       },
+//     ],
+//   },
+//   {
+//     id: "3",
+//     firstName: "Robert",
+//     lastName: "Smith",
+//     guestType: "single_guest",
+//     checkIn: "2024-02-05",
+//     checkOut: "2024-02-08",
+//     bookingId: "booking3",
+//     document: {
+//       documentType: "passport",
+//       documentNumber: "UK456789",
+//       documentIssueCountry: "UK",
+//     },
+//     property: {
+//       id: "prop3",
+//       name: "Mountain View",
+//       apartment: {
+//         id: "apt3",
+//         name: "Room 303",
+//       },
+//     },
+//     alloggiatiStatus: "submitted",
+//     documentScanUrl: "https://example.com/scan3.pdf",
+//     members: [],
+//   },
+// ];

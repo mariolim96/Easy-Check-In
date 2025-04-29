@@ -8,7 +8,12 @@ import type {
   TabellaParams,
   TabellaResponse,
   Apartment,
+  SendParams,
+  SendResponse,
+  TestParams,
+  TestResponse,
 } from "./types";
+import log from "encore.dev/log";
 
 const WSDL_URL =
   "https://alloggiatiweb.poliziadistato.it/service/service.asmx?wsdl";
@@ -208,38 +213,38 @@ export async function testAuthenticationService(params: {
   }
 }
 
-export async function sendFileUnicoService(params: {
-  Utente: string;
-  token: string;
-  ElencoSchedine: string[];
-}) {
-  const client = await getSoapClient();
-  if (!client) {
-    throw new Error("Failed to create SOAP client");
-  }
+// export async function sendFileUnicoService(params: {
+//   Utente: string;
+//   token: string;
+//   ElencoSchedine: string[];
+// }) {
+//   const client = await getSoapClient();
+//   if (!client) {
+//     throw new Error("Failed to create SOAP client");
+//   }
 
-  const result = await client.GestioneAppartamenti_FileUnico_Send(params);
+//   const result = await client.GestioneAppartamenti_FileUnico_Send(params);
 
-  if (result.GestioneAppartamenti_FileUnico_SendResult.ErroreDettaglio) {
-    return {
-      schedineValide: 0,
-      errors: [
-        result.GestioneAppartamenti_FileUnico_SendResult.ErroreDettaglio,
-      ],
-      success: false,
-    };
-  }
+//   if (result.GestioneAppartamenti_FileUnico_SendResult.ErroreDettaglio) {
+//     return {
+//       schedineValide: 0,
+//       errors: [
+//         result.GestioneAppartamenti_FileUnico_SendResult.ErroreDettaglio,
+//       ],
+//       success: false,
+//     };
+//   }
 
-  const detailedErrors = result.result.Dettaglio.EsitoOperazioneServizio.map(
-    (esito) => esito.ErroreDettaglio,
-  ).filter((error) => error !== null && error !== "");
+//   const detailedErrors = result.result.Dettaglio.EsitoOperazioneServizio.map(
+//     (esito) => esito.ErroreDettaglio,
+//   ).filter((error) => error !== null && error !== "");
 
-  return {
-    schedineValide: result.result.SchedineValide,
-    errors: detailedErrors,
-    success: detailedErrors.length === 0,
-  };
-}
+//   return {
+//     schedineValide: result.result.SchedineValide,
+//     errors: detailedErrors,
+//     success: detailedErrors.length === 0,
+//   };
+// }
 
 export async function sendApartmentService(params: {
   Utente: string;
@@ -273,14 +278,143 @@ export async function sendApartmentService(params: {
   };
 }
 
+export async function sendService(params: SendParams): Promise<SendResponse> {
+  const client = await getSoapClient();
+  if (!client) {
+    throw new Error("Failed to create SOAP client");
+  }
+
+  try {
+    // Ensure ElencoSchedine is properly formatted as a string with line breaks
+    // The SOAP service expects a single string with records separated by line breaks
+    const formattedElencoSchedine = Array.isArray(params.ElencoSchedine)
+      ? params.ElencoSchedine.join("")
+      : params.ElencoSchedine;
+
+    log.debug("production service response", {
+      formattedElencoSchedine,
+      //   ...params,
+    });
+    // Create a new params object with the formatted ElencoSchedine
+    const formattedParams = {
+      ...params,
+      ElencoSchedine: formattedElencoSchedine,
+    };
+
+    const [result] = await client.SendAsync(formattedParams);
+
+    if (result.SendResult?.ErroreDettaglio) {
+      return {
+        schedineValide: 0,
+        errors: [result.SendResult.ErroreDettaglio],
+        success: false,
+      };
+    }
+
+    // Check if result.result exists before accessing its properties
+    if (!result.result) {
+      return {
+        schedineValide: 0,
+        errors: ["Invalid response from service: missing result data"],
+        success: false,
+      };
+    }
+
+    const detailedErrors =
+      result.result.Dettaglio?.EsitoOperazioneServizio?.map(
+        (esito) => esito.ErroreDettaglio,
+      ).filter((error) => error !== null && error !== "") || [];
+
+    return {
+      schedineValide: result.result.SchedineValide || 0,
+      errors: detailedErrors,
+      success: detailedErrors.length === 0,
+    };
+  } catch (error) {
+    console.error("Send service error:", error);
+    return {
+      schedineValide: 0,
+      errors: [
+        error instanceof Error ? error.message : "An unknown error occurred",
+      ],
+      success: false,
+    };
+  }
+}
+
+export async function testService(params: TestParams): Promise<TestResponse> {
+  const client = await getSoapClient();
+  if (!client) {
+    throw new Error("Failed to create SOAP client");
+  }
+
+  try {
+    // Ensure ElencoSchedine is properly formatted as a string with line breaks
+    // The SOAP service expects a single string with records separated by line breaks
+    const formattedElencoSchedine = Array.isArray(params.ElencoSchedine)
+      ? params.ElencoSchedine.join("\r\n")
+      : params.ElencoSchedine;
+
+    // Create a new params object with the formatted ElencoSchedine
+    const formattedParams = {
+      ...params,
+      ElencoSchedine: formattedElencoSchedine,
+    };
+    log.debug("production service response", {
+      formattedElencoSchedine,
+      ...params,
+    });
+    const [result] = await client.TestAsync(formattedParams);
+
+    if (result.TestResult?.ErroreDettaglio) {
+      return {
+        schedineValide: 0,
+        errors: [result.TestResult.ErroreDettaglio],
+        success: false,
+      };
+    }
+
+    // Check if result.result exists before accessing its properties
+    if (!result.result) {
+      return {
+        schedineValide: 0,
+        errors: ["Invalid response from service: missing result data"],
+        success: false,
+      };
+    }
+
+    const detailedErrors =
+      result.result.Dettaglio?.EsitoOperazioneServizio?.map(
+        (esito: { ErroreDettaglio: any }) => esito.ErroreDettaglio,
+      ).filter((error: string | null) => error !== null && error !== "") || [];
+
+    return {
+      schedineValide: result.result.SchedineValide || 0,
+      errors: detailedErrors,
+      success: detailedErrors.length === 0,
+    };
+  } catch (error) {
+    console.error("Test service error:", error);
+    return {
+      schedineValide: 0,
+      errors: [
+        error instanceof Error ? error.message : "An unknown error occurred",
+      ],
+      success: false,
+    };
+  }
+}
+
 const Services = {
   generateTokenService,
   addApartmentService,
   disableApartmentService,
   testAuthenticationService,
-  sendFileUnicoService,
+  //   sendFileUnicoService,
   sendApartmentService,
   tabellaService,
+  sendService,
+  testService,
 };
 
 export default Services;

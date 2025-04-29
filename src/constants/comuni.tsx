@@ -67704,3 +67704,12 @@ export const COMUNI = [
     DataFineVal: "31/12/1983 00:00:00",
   },
 ];
+
+export const COMUNI_MAP = new Map(
+  COMUNI.map(({ Codice, Descrizione, Provincia, DataFineVal }) => {
+    return [
+      Codice.toString(),
+      { Codice: Codice.toString(), Descrizione, Provincia, DataFineVal },
+    ];
+  }),
+);

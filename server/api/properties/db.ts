@@ -133,7 +133,7 @@ export const propertyQueries = {
   ) {
     const result = db.query<AvailableProperty>`
       WITH available_apartments AS (
-        SELECT 
+        SELECT
           a.id as apartment_id,
           a.name as apartment_name,
           a.max_guests,
@@ -147,11 +147,11 @@ export const propertyQueries = {
             SELECT 1 FROM bookings b
             WHERE b.apartment_id = a.id
               AND (
-                (b.check_in <= ${dateTo} AND b.check_out >= ${dateFrom})
+                (b.check_in < ${dateTo} AND b.check_out > ${dateFrom})
               )
           )
       )
-      SELECT 
+      SELECT
         p.id,
         p.name,
         COALESCE(

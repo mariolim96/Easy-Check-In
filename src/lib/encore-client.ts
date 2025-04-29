@@ -86,30 +86,6 @@ export namespace Alloggiati {
       this.baseClient = baseClient;
     }
 
-    public async addApartment(
-      params: alloggiati.AddApartmentParams,
-    ): Promise<alloggiati.AddApartmentResponse> {
-      // Now make the actual call to the API
-      const resp = await this.baseClient.callTypedAPI(
-        "POST",
-        `/Alloggiati.addApartment`,
-        JSON.stringify(params),
-      );
-      return (await resp.json()) as alloggiati.AddApartmentResponse;
-    }
-
-    public async disableApartment(
-      params: alloggiati.DisableApartmentParams,
-    ): Promise<alloggiati.DisableApartmentResponse> {
-      // Now make the actual call to the API
-      const resp = await this.baseClient.callTypedAPI(
-        "POST",
-        `/Alloggiati.disableApartment`,
-        JSON.stringify(params),
-      );
-      return (await resp.json()) as alloggiati.DisableApartmentResponse;
-    }
-
     public async generateToken(
       params: alloggiati.GenerateTokenParams,
     ): Promise<alloggiati.GenerateTokenResponse> {
@@ -122,40 +98,34 @@ export namespace Alloggiati {
       return (await resp.json()) as alloggiati.GenerateTokenResponse;
     }
 
-    public async getTabella(
-      params: alloggiati.TabellaParams,
-    ): Promise<alloggiati.TabellaResponse> {
+    public async send(
+      params: alloggiati.SendParams,
+    ): Promise<alloggiati.SendResponse> {
       // Now make the actual call to the API
       const resp = await this.baseClient.callTypedAPI(
         "POST",
-        `/Alloggiati.getTabella`,
+        `/Alloggiati.send`,
         JSON.stringify(params),
       );
-      return (await resp.json()) as alloggiati.TabellaResponse;
-    }
-
-    public async sendApartment(
-      params: alloggiati.SendApartmentParams,
-    ): Promise<alloggiati.SendApartmentResponse> {
-      // Now make the actual call to the API
-      const resp = await this.baseClient.callTypedAPI(
-        "POST",
-        `/Alloggiati.sendApartment`,
-        JSON.stringify(params),
-      );
-      return (await resp.json()) as alloggiati.SendApartmentResponse;
+      return (await resp.json()) as alloggiati.SendResponse;
     }
 
     public async sendFileUnico(
       params: alloggiati.SendFileUnicoParams,
-    ): Promise<alloggiati.SendFileUnicoResponse> {
+    ): Promise<{
+      guest: string[];
+      response: any;
+    }> {
       // Now make the actual call to the API
       const resp = await this.baseClient.callTypedAPI(
         "POST",
         `/Alloggiati.sendFileUnico`,
         JSON.stringify(params),
       );
-      return (await resp.json()) as alloggiati.SendFileUnicoResponse;
+      return (await resp.json()) as {
+        guest: string[];
+        response: any;
+      };
     }
 
     public async testAuthentication(
@@ -338,14 +308,13 @@ export namespace guests {
     id: string;
     firstName: string;
     lastName: string;
+    gender: string;
+    dateOfBirth: string;
+    citizenship: string;
+    placeOfBirth: string;
     guestType: string;
     checkIn: string;
     checkOut: string;
-    document: {
-      documentType: string;
-      documentNumber: string;
-      documentIssueCountry: string;
-    };
     property: {
       id: string;
       name: string;
@@ -355,9 +324,8 @@ export namespace guests {
       };
     };
     alloggiatiStatus: "pending" | "submitted" | "error";
-    members?: GuestListItem[];
     bookingId: string;
-    parent_id?: string;
+    parent_id: string | null;
   }
 
   export interface GuestResponse {
@@ -366,7 +334,37 @@ export namespace guests {
   }
 
   export interface ListGuestsResponse {
-    guests: GuestListItem[];
+    guests: guestWithDocument[];
+  }
+
+  export interface guestWithDocument {
+    document: {
+      documentType: string;
+      documentNumber: string;
+      documentIssueCountry: string;
+    };
+    members?: GuestListItem[];
+    id: string;
+    firstName: string;
+    lastName: string;
+    gender: string;
+    dateOfBirth: string;
+    citizenship: string;
+    placeOfBirth: string;
+    guestType: string;
+    checkIn: string;
+    checkOut: string;
+    property: {
+      id: string;
+      name: string;
+      apartment: {
+        id: string;
+        name: string;
+      };
+    };
+    alloggiatiStatus: "pending" | "submitted" | "error";
+    bookingId: string;
+    parent_id: string | null;
   }
 
   export class ServiceClient {
@@ -507,29 +505,6 @@ export namespace Property {
 }
 
 export namespace alloggiati {
-  export interface AddApartmentParams {
-    Utente: string;
-    token: string;
-    Descrizione: string;
-    ComuneCodice: string;
-    Indirizzo: string;
-    Proprietario: string;
-  }
-
-  export interface AddApartmentResponse {
-    success: boolean;
-    error?: string;
-  }
-
-  export interface Apartment {
-    IDAPP: string;
-    Descrizione: string;
-    COMUNE: string;
-    PROV: string;
-    Indirizzo: string;
-    Proprietario: string;
-  }
-
   export interface AuthenticationTestParams {
     Utente: string;
     token: string;
@@ -538,17 +513,6 @@ export namespace alloggiati {
   export interface AuthenticationTestResponse {
     ErroreDettaglio: string;
     success?: boolean;
-  }
-
-  export interface DisableApartmentParams {
-    Utente: string;
-    token: string;
-    IdAppartamento: number;
-  }
-
-  export interface DisableApartmentResponse {
-    success: boolean;
-    error?: string;
   }
 
   export interface GenerateTokenParams {
@@ -564,48 +528,25 @@ export namespace alloggiati {
     error?: string;
   }
 
-  export interface SendApartmentParams {
-    Utente: string;
-    token: string;
-    ElencoSchedine: string[];
-    IdAppartamento: number;
-  }
-
-  export interface SendApartmentResponse {
-    schedineValide: number;
-    errors: string[];
-    success: boolean;
-  }
-
   export interface SendFileUnicoParams {
-    Utente: string;
-    token: string;
-    ElencoSchedine: string[];
+    /**
+     * Utente: string;
+     * token: string;
+     */
+    ElencoSchedine: guests.guestWithDocument;
   }
 
-  export interface SendFileUnicoResponse {
+  export interface SendParams {
+    Utente: string;
+    token: string;
+    ElencoSchedine: string[] | string;
+  }
+
+  export interface SendResponse {
     schedineValide: number;
     errors: string[];
     success: boolean;
   }
-
-  export interface TabellaParams {
-    Utente: string;
-    token: string;
-    tipo: TabellaType;
-  }
-
-  export interface TabellaResponse {
-    data: Apartment[];
-    error?: string;
-  }
-
-  export type TabellaType =
-    | "Luoghi"
-    | "Tipi_Documento"
-    | "Tipi_Alloggiato"
-    | "TipoErrore"
-    | "ListaAppartamenti";
 }
 
 export namespace auth {

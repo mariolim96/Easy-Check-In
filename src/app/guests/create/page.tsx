@@ -32,6 +32,7 @@ import { DateInputPicker } from "@/components/ui/date-input-picker";
 import { SelectSearch } from "@/components/ui/select-search";
 import { STATI } from "@/constants/stati";
 import { COMUNI } from "@/constants/comuni";
+import { DOCUMENTI } from "@/constants/documenti";
 
 // Transform STATI and COMUNI for SelectSearch options
 const countryOptions = STATI.map((stato) => ({
@@ -46,6 +47,12 @@ const comuneOptions = COMUNI.map((comune) => ({
 
 // Combine both options with a separator
 const documentIssuePlaceOptions = comuneOptions.concat(countryOptions);
+
+// Transform DOCUMENTI for SelectSearch options
+const documentOptions = DOCUMENTI.map((doc) => ({
+  value: doc.Codice,
+  label: doc.Descrizione,
+}));
 
 const memberSchema = z.object({
   arrivalDate: z.date({
@@ -88,20 +95,7 @@ const guestSchema = z.object({
   }),
   gender: z.enum(["M", "F"]),
   documentIssuePlace: z.string().min(1, "Document issue place is required"),
-  documentType: z.enum(
-    [
-      "passport", // Passaporto
-      "id_card", // Carta d'identità
-      "residence_permit", // Permesso di soggiorno
-      "driving_license", // Patente di guida (only for Italian citizens)
-      "firearms_license", // Porto d'armi (only for Italian citizens)
-      "nautical_license", // Patente nautica (only for Italian citizens)
-      "diplomatic_id", // Tessera diplomatica
-    ],
-    {
-      required_error: "Document type is required",
-    },
-  ),
+  documentType: z.string().min(1, "Document type is required"),
   documentNumber: z.string().min(1, "Document number is required"),
   members: z.array(memberSchema).optional(),
 });
@@ -112,6 +106,7 @@ function CreateGuestForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, setIsPending] = useState(false);
+  const sendAlloggiati = Encore.Alloggiati.sendFileUnico;
 
   // Get booking dates from URL params
   const checkIn = searchParams.get("checkIn");
@@ -386,11 +381,12 @@ function CreateGuestForm() {
                       <FormLabel>Place of Birth</FormLabel>
                       <FormControl>
                         <SelectSearch
-                          options={countryOptions}
+                          options={documentIssuePlaceOptions}
                           value={field.value}
                           onChange={field.onChange}
                           placeholder="Select place of birth"
-                          searchPlaceholder="Search countries..."
+                          searchPlaceholder="Search places..."
+                          emptyMessage="No places found"
                         />
                       </FormControl>
                       <FormMessage />
@@ -438,22 +434,16 @@ function CreateGuestForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Document Type</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select document type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="passport">Passaporto</SelectItem>
-                          <SelectItem value="id_card">
-                            Carta d&apos;identità
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <SelectSearch
+                          options={documentOptions}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select document type"
+                          searchPlaceholder="Search documents..."
+                          emptyMessage="No documents found"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -630,11 +620,12 @@ function CreateGuestForm() {
                                 <FormLabel>Place of Birth</FormLabel>
                                 <FormControl>
                                   <SelectSearch
-                                    options={countryOptions}
+                                    options={documentIssuePlaceOptions}
                                     value={field.value}
                                     onChange={field.onChange}
                                     placeholder="Select place of birth"
-                                    searchPlaceholder="Search countries..."
+                                    searchPlaceholder="Search places..."
+                                    emptyMessage="No places found"
                                   />
                                 </FormControl>
                                 <FormMessage />

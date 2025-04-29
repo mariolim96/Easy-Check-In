@@ -1,4 +1,5 @@
 import type { Client } from "soap";
+import { GuestListItem, guestWithDocument } from "../guests/types";
 
 export interface SoapClient extends Client {
   GenerateToken(params: GenerateTokenParams): Promise<{
@@ -24,10 +25,10 @@ export interface SoapClient extends Client {
   ): Promise<{
     GestioneAppartamenti_DisabilitaAppartamentoResult: DisableApartmentResult;
   }>;
-  GestioneAppartamenti_FileUnico_Send(params: SendFileUnicoParams): Promise<{
-    GestioneAppartamenti_FileUnico_SendResult: { ErroreDettaglio: string };
-    result: SendFileUnicoResult;
-  }>;
+  //   GestioneAppartamenti_FileUnico_Send(params: SendFileUnicoParams): Promise<{
+  //     GestioneAppartamenti_FileUnico_SendResult: { ErroreDettaglio: string };
+  //     result: SendFileUnicoResult;
+  //   }>;
   GestioneAppartamenti_Send(params: SendApartmentParams): Promise<{
     GestioneAppartamenti_SendResult: { ErroreDettaglio: string };
     result: SendFileUnicoResult;
@@ -35,6 +36,16 @@ export interface SoapClient extends Client {
   Tabella(params: TabellaParams): Promise<{
     TabellaResult: TabellaResult;
   }>;
+  SendAsync(params: SendParams): Promise<
+    [
+      {
+        SendResult: {
+          ErroreDettaglio: string;
+        };
+        result: SendResult;
+      },
+    ]
+  >;
 }
 export interface GenerateTokenParams {
   Utente: string;
@@ -98,9 +109,9 @@ export interface SendFileUnicoResult {
   Dettaglio: { EsitoOperazioneServizio: EsitoOperazioneServizio[] };
 }
 export interface SendFileUnicoParams {
-  Utente: string;
-  token: string;
-  ElencoSchedine: string[];
+  //   Utente: string;
+  //   token: string;
+  ElencoSchedine: guestWithDocument;
 }
 export interface SendFileUnicoResponse {
   schedineValide: number;
@@ -151,4 +162,45 @@ export interface Apartment {
 export interface TabellaResponse {
   data: Apartment[];
   error?: string;
+}
+
+export interface SendParams {
+  Utente: string;
+  token: string;
+  ElencoSchedine: string[] | string;
+}
+
+export interface SendResult {
+  SchedineValide: number;
+  Dettaglio: {
+    EsitoOperazioneServizio: EsitoOperazioneServizio[];
+  };
+}
+
+export interface SendResponse {
+  schedineValide: number;
+  errors: string[];
+  success: boolean;
+}
+
+export interface TestParams {
+  Utente: string;
+  token: string;
+  ElencoSchedine: string[] | string;
+}
+
+export interface TestResult {
+  ErroreDettaglio: string;
+  result?: {
+    SchedineValide: number;
+    Dettaglio: {
+      EsitoOperazioneServizio: EsitoOperazioneServizio[];
+    };
+  };
+}
+
+export interface TestResponse {
+  schedineValide: number;
+  errors: string[];
+  success: boolean;
 }
